@@ -1,5 +1,5 @@
 \echo 'Insert utils functions'
-\echo 'Rights: db owner'
+\echo 'Required rights: db owner'
 \echo 'GeoNature database compatibility : v2.3.0+'
 BEGIN;
 
@@ -138,7 +138,7 @@ CREATE OR REPLACE FUNCTION utilisateurs.get_id_organism_by_name(oName character 
     IMMUTABLE
 AS
 $function$
-    -- Function which return the id_acquisition_framework from an acquition_framework_name
+    -- Function which return the id_organisme from an nom_organisme
     DECLARE idOrganism integer;
 
     BEGIN
@@ -180,7 +180,7 @@ CREATE OR REPLACE FUNCTION utilisateurs.get_id_role_by_identifier(identifier cha
     IMMUTABLE
 AS
 $function$
-    -- Function which return the id_acquisition_framework from an acquition_framework_name
+    -- Function which return the id_role from an identifer
     DECLARE idRole integer;
 
     BEGIN
