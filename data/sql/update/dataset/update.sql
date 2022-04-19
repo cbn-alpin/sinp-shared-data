@@ -79,12 +79,10 @@ BEGIN
             LIMIT step
             OFFSET offsetCnt
         ) AS dit
-        WHERE ( -- TODO: check if OR below is a good idea or not !
-                dit.shortname = td.dataset_shortname
-                OR
-                dit.unique_id = td.unique_dataset_id
-            ) ;
-            -- Avoid using meta_update_date because it's not always correct.
+        WHERE dit.unique_id = td.unique_dataset_id ;
+            -- Join on uuid only to avoid issues when dataset shortnames ara duplicated:
+            -- OR dit.shortname = td.dataset_shortname
+            -- Avoid using meta_update_date because it's not always correct:
             -- AND dit.meta_update_date > td.meta_update_date
 
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
@@ -99,9 +97,9 @@ BEGIN
             FROM gn_meta.t_datasets AS td
                 JOIN gn_imports.${datasetImportTable} AS dit
                     ON (
-                        dit.shortname = td.dataset_shortname
-                        OR
                         dit.unique_id = td.unique_dataset_id
+                        OR
+                        dit.shortname = td.dataset_shortname
                     )
             WHERE dit.meta_last_action = 'U'
             ORDER BY dit.gid ASC
@@ -119,7 +117,7 @@ BEGIN
             territory_desc
         )
             SELECT
-                COALESCE(gn_meta.get_id_dataset_by_shortname(dit.shortname), gn_meta.get_id_dataset_by_uuid(dit.unique_id)),
+                COALESCE(gn_meta.get_id_dataset_by_uuid(dit.unique_id), gn_meta.get_id_dataset_by_shortname(dit.shortname)),
                 ref_nomenclatures.get_id_nomenclature('TERRITOIRE', elems ->> 0),
                 elems ->> 1
             FROM gn_imports.${datasetImportTable} AS dit,
@@ -141,9 +139,9 @@ BEGIN
             FROM gn_meta.t_datasets AS td
                 JOIN gn_imports.${datasetImportTable} AS dit
                     ON (
-                        dit.shortname = td.dataset_shortname
-                        OR
                         dit.unique_id = td.unique_dataset_id
+                        OR
+                        dit.shortname = td.dataset_shortname
                     )
             WHERE dit.meta_last_action = 'U'
             ORDER BY dit.gid ASC
@@ -161,7 +159,7 @@ BEGIN
             id_nomenclature_actor_role
         )
             SELECT
-                COALESCE(gn_meta.get_id_dataset_by_shortname(dit.shortname), gn_meta.get_id_dataset_by_uuid(dit.unique_id)),
+                COALESCE(gn_meta.get_id_dataset_by_uuid(dit.unique_id), gn_meta.get_id_dataset_by_shortname(dit.shortname)),
                 COALESCE(utilisateurs.get_id_organism_by_name(elems ->> 0), utilisateurs.get_id_organism_by_uuid((elems ->> 0)::uuid)),
                 ref_nomenclatures.get_id_nomenclature('ROLE_ACTEUR', elems ->> 1)
             FROM gn_imports.${datasetImportTable} AS dit,
@@ -182,7 +180,7 @@ BEGIN
             id_nomenclature_actor_role
         )
             SELECT
-                COALESCE(gn_meta.get_id_dataset_by_shortname(dit.shortname), gn_meta.get_id_dataset_by_uuid(dit.unique_id)),
+                COALESCE(gn_meta.get_id_dataset_by_uuid(dit.unique_id), gn_meta.get_id_dataset_by_shortname(dit.shortname)),
                 COALESCE(utilisateurs.get_id_role_by_identifier(elems ->> 0), utilisateurs.get_id_role_by_uuid((elems ->> 0)::uuid)),
                 ref_nomenclatures.get_id_nomenclature('ROLE_ACTEUR', elems ->> 1)
             FROM gn_imports.${datasetImportTable} AS dit,
