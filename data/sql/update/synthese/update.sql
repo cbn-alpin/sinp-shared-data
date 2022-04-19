@@ -9,18 +9,24 @@ BEGIN;
 
 SET client_encoding = 'UTF8';
 
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Disable trigger "tri_meta_dates_change_synthese"'
 ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_meta_dates_change_synthese ;
+
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Disable trigger "tri_update_calculate_sensitivity"'
 ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_update_calculate_sensitivity ;
 
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Disable trigger "tri_update_cor_area_synthese"'
+ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_update_cor_area_synthese ;
+
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Batch updating in "synthese" of the imported observations'
--- TODO : set stopAt with a "SELECT COUNT(*) FROM :gn_imports.${syntheseImportTable}" query.
--- TODO: find a better field than name to link because it must be updated too !
 DO $$
 DECLARE
     step INTEGER;
@@ -168,8 +174,9 @@ BEGIN
             LIMIT step
             OFFSET offsetCnt
         ) AS sit
-        WHERE sit.unique_id_sinp = s.unique_id_sinp
-            OR sit.source_key = s.entity_source_pk_value ; -- TODO: test this !
+        WHERE sit.unique_id_sinp = s.unique_id_sinp ;
+            -- Avoid use of source_key (with index or not), the query is very slow !
+            -- OR sit.source_key = s.entity_source_pk_value ;
             -- Avoid using meta_update_date because it's not always correct.
             -- AND sit.meta_update_date > s.meta_update_date ;
 
@@ -180,6 +187,11 @@ BEGIN
     END LOOP ;
 END
 $$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Enable trigger "tri_update_cor_area_synthese"'
+ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_update_cor_area_synthese ;
 
 
 \echo '-------------------------------------------------------------------------------'

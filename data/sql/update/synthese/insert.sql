@@ -21,6 +21,11 @@ ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_insert_calculate_sensitivit
 
 
 \echo '-------------------------------------------------------------------------------'
+\echo 'Disable trigger "tri_insert_cor_area_synthese"'
+ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_insert_cor_area_synthese ;
+
+
+\echo '-------------------------------------------------------------------------------'
 \echo 'Batch updating in "synthese" of the imported observations'
 -- TODO: check if we can use source_key and entity_source_pk_value to link observations in NOT EXISTS
 DO $$
@@ -185,6 +190,11 @@ BEGIN
     END LOOP ;
 END
 $$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Enable trigger "tri_insert_cor_area_synthese"'
+ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_insert_cor_area_synthese ;
 
 
 \echo '-------------------------------------------------------------------------------'
