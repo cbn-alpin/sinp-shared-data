@@ -72,8 +72,8 @@ ALTER TABLE gn_imports.:organismImportTable OWNER TO :gnDbOwner ;
 \echo 'Copy CVS file to import organisms table'
 COPY gn_imports.:organismImportTable (
     unique_id,
-    name,
-    address,
+    "name",
+    "address",
     postal_code,
     city,
     phone,
