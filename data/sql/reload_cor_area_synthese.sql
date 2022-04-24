@@ -11,42 +11,6 @@ BEGIN;
 
 
 \echo '----------------------------------------------------------------------------'
-\echo 'Refresh "gn_synthese.v_synthese_for_export" materialized view if necessary'
-DO $$
-    BEGIN
-        IF EXISTS (
-            SELECT 1
-            FROM pg_matviews
-            WHERE schemaname = 'gn_synthese' AND matviewname = 'v_synthese_for_export'
-        ) IS TRUE THEN
-            RAISE NOTICE ' "gn_synthese.v_synthese_for_export" is a materialized view => refresh !' ;
-            REFRESH MATERIALIZED VIEW CONCURRENTLY gn_synthese.v_synthese_for_export ;
-        ELSE
-            RAISE NOTICE ' "gn_synthese.v_synthese_for_export" is not a materialized view => NO refresh !' ;
-        END IF ;
-    END
-$$ ;
-
-
-\echo '----------------------------------------------------------------------------'
-\echo 'Refresh "gn_profiles" materialized view if necessary'
-DO $$
-    BEGIN
-        IF EXISTS (
-            SELECT 1
-            FROM information_schema.schemata
-            WHERE schema_name = 'gn_profiles'
-        ) IS TRUE THEN
-            RAISE NOTICE ' Refreshing "gn_profiles" materialized views.' ;
-            PERFORM gn_profiles.refresh_profiles();
-        ELSE
-            RAISE NOTICE ' "gn_profiles" schema not exists !' ;
-        END IF ;
-    END
-$$ ;
-
-
-\echo '----------------------------------------------------------------------------'
 \echo 'Disable triggers depending of GeoNature version'
 DO $$
     BEGIN
@@ -238,6 +202,42 @@ DO $$
             ALTER TABLE cor_area_synthese ENABLE TRIGGER tri_update_cor_area_taxon_update_cd_nom ;
         ELSE
       		RAISE NOTICE ' GeoNature > v2.5.5 => trigger "tri_update_cor_area_taxon_update_cd_nom" not exists !' ;
+        END IF ;
+    END
+$$ ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Refresh "gn_synthese.v_synthese_for_export" materialized view if necessary'
+DO $$
+    BEGIN
+        IF EXISTS (
+            SELECT 1
+            FROM pg_matviews
+            WHERE schemaname = 'gn_synthese' AND matviewname = 'v_synthese_for_export'
+        ) IS TRUE THEN
+            RAISE NOTICE ' "gn_synthese.v_synthese_for_export" is a materialized view => refresh !' ;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY gn_synthese.v_synthese_for_export ;
+        ELSE
+            RAISE NOTICE ' "gn_synthese.v_synthese_for_export" is not a materialized view => NO refresh !' ;
+        END IF ;
+    END
+$$ ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Refresh "gn_profiles" materialized view if necessary'
+DO $$
+    BEGIN
+        IF EXISTS (
+            SELECT 1
+            FROM information_schema.schemata
+            WHERE schema_name = 'gn_profiles'
+        ) IS TRUE THEN
+            RAISE NOTICE ' Refreshing "gn_profiles" materialized views.' ;
+            PERFORM gn_profiles.refresh_profiles();
+        ELSE
+            RAISE NOTICE ' "gn_profiles" schema not exists !' ;
         END IF ;
     END
 $$ ;
