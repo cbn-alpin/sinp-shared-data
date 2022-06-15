@@ -293,9 +293,7 @@ CREATE OR REPLACE FUNCTION gn_imports.computeImportStep(total INT)
 RETURNS INT
 LANGUAGE plpgsql AS $$
 BEGIN
-    IF total <= 10000 THEN
-        RETURN 1000;
-    ELSIF total <= 100000 THEN
+    IF total <= 100000 THEN
         RETURN 10000;
     ELSIF total > 100000 AND total <= 2500000 THEN
         RETURN 100000;
