@@ -207,11 +207,6 @@ ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_meta_dates_change_synthese ;
 ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_insert_calculate_sensitivity ;
 
 
-\echo '-------------------------------------------------------------------------------'
-\echo 'Enable trigger "tri_insert_cor_area_synthese"'
-ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_insert_cor_area_synthese ;
-
-
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
 COMMIT;
