@@ -7,5 +7,5 @@ Pour transférer uniquement le dossier `shared/` sur le serveur, utiliser `rsync
 en testant avec l'option `--dry-run` (à supprimer quand tout est ok):
 
 ```bash
-rsync -av --copy-unsafe-links --exclude .git --exclude .gitignore --exclude data/raw/ --exclude config/settings.ini ./ geonat@db-<region>-sinp:~/data/shared/
+rsync -av --copy-unsafe-links --exclude .git --exclude .gitignore --exclude data/raw/ --exclude config/settings.ini ./ geonat@db-<region>-sinp:~/data/shared/ --dry-run
 ```
