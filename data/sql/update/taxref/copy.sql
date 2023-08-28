@@ -114,17 +114,6 @@ COPY gn_imports.:taxrefImportTable (
 FROM :'csvFilePath'
 WITH (FORMAT CSV, HEADER, DELIMITER E'\t', FORCE_NULL (phylum, classe, ordre, famille, sous_famille, tribu, lb_auteur, nom_valide, nom_vern, nom_vern_eng));
 
-\echo '-------------------------------------------------------------------------------'
-\echo 'Update table gn_imports.:taxrefImportTable for cd_nom < 15 and cd_ref < 15'
-UPDATE gn_imports.:taxrefImportTable
-SET cd_nom = cd_nom + 30000000
-WHERE cd_nom < 15
-;
-
-UPDATE gn_imports.:taxrefImportTable
-SET cd_ref = cd_ref + 30000000
-WHERE cd_ref < 15
-;
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
