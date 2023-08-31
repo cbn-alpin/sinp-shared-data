@@ -303,6 +303,27 @@ BEGIN
 END;
 $$;
 
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "clean_uuid_observers()"'
+CREATE OR REPLACE FUNCTION public.clean_uuid_observers(observersImported varchar)
+ RETURNS text
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+	DECLARE
+		observersExported text;
+
+	BEGIN
+		observersExported := '';
+
+		SELECT INTO observersExported
+			regexp_replace(observersImported,'[\s]\[(.*?)\]','','g');
+
+		RETURN observersExported;
+	END;
+$function$
+;
+
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
 COMMIT;

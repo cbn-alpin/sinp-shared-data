@@ -161,7 +161,7 @@ BEGIN
             validator,
             validation_comment,
             validation_date,
-            observers,
+            public.clean_uuid_observers(observers),
             determiner,
             id_digitiser,
             id_nomenclature_determination_method,
