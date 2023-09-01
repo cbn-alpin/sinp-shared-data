@@ -161,7 +161,7 @@ BEGIN
             validator,
             validation_comment,
             validation_date,
-            observers,
+            public.clean_uuid_observers(observers),
             determiner,
             id_digitiser,
             id_nomenclature_determination_method,
@@ -213,18 +213,14 @@ INSERT INTO gn_synthese.cor_observer_synthese (id_synthese, id_role)
     SELECT distinct
         s.id_synthese,
         t.id_role
-    from gn_imports.test_synthese_1 ts
+    from gn_imports.:syntheseImportTable sit
     JOIN gn_synthese.synthese s
-            ON s.unique_id_sinp = ts.unique_id_sinp
-    cross join lateral regexp_matches(ts.observers, '\[(.*?)\]', 'g') as MATCH
+            ON s.unique_id_sinp = sit.unique_id_sinp
+    cross join lateral regexp_matches(sit.observers, '\[(.*?)\]', 'g') as MATCH
     JOIN utilisateurs.t_roles t
             ON t.uuid_role::text = match[1]
 ON CONFLICT ON CONSTRAINT pk_cor_observer_synthese DO NOTHING ;
 
-\echo '-------------------------------------------------------------------------------'
-\echo 'Clean synthese observer''s uuids'
-UPDATE gn_synthese.synthese
-SET observers = public.clean_uuid_observers(observers);
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
