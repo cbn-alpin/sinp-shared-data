@@ -213,7 +213,7 @@ INSERT INTO gn_synthese.cor_observer_synthese (id_synthese, id_role)
     SELECT distinct
         s.id_synthese,
         t.id_role
-    from gn_imports.:syntheseImportTable sit
+    from gn_imports.${syntheseImportTable} sit
     JOIN gn_synthese.synthese s
             ON s.unique_id_sinp = sit.unique_id_sinp
     cross join lateral regexp_matches(sit.observers, '\[(.*?)\]', 'g') as MATCH
