@@ -204,19 +204,22 @@ BEGIN
         INSERT INTO gn_meta.cor_acquisition_framework_actor (
             id_acquisition_framework,
             id_role,
+            id_organism,
             id_nomenclature_actor_role
         )
             SELECT
                 COALESCE(gn_meta.get_id_acquisition_framework_by_name(afit.name), gn_meta.get_id_acquisition_framework_by_uuid(afit.unique_id)),
                 COALESCE(utilisateurs.get_id_role_by_identifier(elems ->> 0), utilisateurs.get_id_role_by_uuid((elems ->> 0)::uuid)),
+                COALESCE(utilisateurs.get_id_organism_by_name(elemso ->> 0), utilisateurs.get_id_organism_by_uuid((elemso ->> 0)::uuid)),
                 ref_nomenclatures.get_id_nomenclature('ROLE_ACTEUR', elems ->> 1)
             FROM gn_imports.${afImportTable} AS afit,
-                json_array_elements(array_to_json(afit.cor_actors_user)) elems
+                json_array_elements(array_to_json(afit.cor_actors_user)) elems,
+                json_array_elements(array_to_json(afit.cor_actors_organism)) elemso
             WHERE afit.meta_last_action = 'I'
             ORDER BY afit.gid ASC
             LIMIT step
             OFFSET offsetCnt
-        ON CONFLICT ON CONSTRAINT check_is_unique_cor_acquisition_framework_actor_role DO NOTHING ;
+        ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
         RAISE NOTICE 'Inserted "actor => USER" link rows: %', affectedRows ;
 
