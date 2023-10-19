@@ -93,6 +93,7 @@ BEGIN
             the_geom_point,
             the_geom_local,
             precision,
+            id_area_attachment,
             date_min,
             date_max,
             validator,
@@ -152,10 +153,14 @@ BEGIN
             depth_min,
             depth_max,
             place_name,
-            ST_Transform(geom, 4326),
-            ST_Transform(ST_Centroid(geom), 4326),
-            geom,
+            ST_Transform(sit.geom, 4326),
+            ST_Transform(ST_Centroid(sit.geom), 4326),
+            sit.geom,
             precision,
+            CASE
+		        WHEN sit.id_nomenclature_info_geo_type = ref_nomenclatures.get_id_nomenclature('TYP_INF_GEO', '2')
+			        THEN la.id_area
+	        END AS id_area_attachment,
             date_min,
             date_max,
             validator,
@@ -167,11 +172,12 @@ BEGIN
             id_nomenclature_determination_method,
             comment_context,
             comment_description,
-            additional_data,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            sit.additional_data,
+            sit.meta_create_date,
+            sit.meta_update_date,
+            sit.meta_last_action
         FROM gn_imports.${syntheseImportTable} AS sit
+            LEFT JOIN ref_geo.l_areas la ON st_within(sit.geom, la.geom)
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM gn_synthese.synthese AS s
