@@ -157,10 +157,7 @@ BEGIN
             ST_Transform(ST_Centroid(sit.geom), 4326),
             sit.geom,
             precision,
-            CASE
-		        WHEN sit.id_nomenclature_info_geo_type = ref_nomenclatures.get_id_nomenclature('TYP_INF_GEO', '2')
-			        THEN la.id_area
-	        END AS id_area_attachment,
+            sit.code_area_attachment,
             date_min,
             date_max,
             validator,
@@ -177,7 +174,6 @@ BEGIN
             sit.meta_update_date,
             sit.meta_last_action
         FROM gn_imports.${syntheseImportTable} AS sit
-            LEFT JOIN ref_geo.l_areas la ON st_within(sit.geom, la.geom)
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM gn_synthese.synthese AS s
