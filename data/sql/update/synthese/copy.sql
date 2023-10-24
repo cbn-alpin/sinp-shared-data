@@ -145,7 +145,7 @@ COPY gn_imports.:syntheseImportTable (
     place_name,
     geom,
     precision,
-    code_area_attachment,
+    id_area_attachment,
     date_min,
     date_max,
     validator,

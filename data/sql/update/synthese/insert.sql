@@ -153,11 +153,11 @@ BEGIN
             depth_min,
             depth_max,
             place_name,
-            ST_Transform(sit.geom, 4326),
-            ST_Transform(ST_Centroid(sit.geom), 4326),
-            sit.geom,
+            ST_Transform(geom, 4326),
+            ST_Transform(ST_Centroid(geom), 4326),
+            geom,
             precision,
-            sit.code_area_attachment,
+            id_area_attachment,
             date_min,
             date_max,
             validator,
@@ -169,10 +169,10 @@ BEGIN
             id_nomenclature_determination_method,
             comment_context,
             comment_description,
-            sit.additional_data,
-            sit.meta_create_date,
-            sit.meta_update_date,
-            sit.meta_last_action
+            additional_data,
+            meta_create_date,
+            meta_update_date,
+            meta_last_action
         FROM gn_imports.${syntheseImportTable} AS sit
         WHERE NOT EXISTS (
                 SELECT 'X'
