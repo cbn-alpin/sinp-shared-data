@@ -279,7 +279,7 @@ function checkBinary() {
                 return 1
             fi
         fi
-        printVerbose "Found dependency: ${cmd}"
+        printVerbose "Found dependency: ${cmd} => ${Gre-}OK" ${Gra-}
     done
     return 0
 }
@@ -334,16 +334,16 @@ function displayTime() {
     if [[ $# -lt 1 ]]; then
         exitScript "Missing required argument to ${FUNCNAME[0]}()!" 2
     fi
-	local T="${1}"
-	local D=$((T/60/60/24))
-	local H=$((T/60/60%24))
-	local M=$((T/60%60))
-	local S=$((T%60))
-	[[ $D > 0 ]] && printf '%d days ' $D
-	[[ $H > 0 ]] && printf '%d hours ' $H
-	[[ $M > 0 ]] && printf '%d minutes ' $M
-	[[ $D > 0 || $H > 0 || $M > 0 ]] && printf 'and '
-	printf '%d seconds\n' $S
+    local T="${1}"
+    local D=$((T/60/60/24))
+    local H=$((T/60/60%24))
+    local M=$((T/60%60))
+    local S=$((T%60))
+    [[ $D > 0 ]] && printf '%d days ' $D
+    [[ $H > 0 ]] && printf '%d hours ' $H
+    [[ $M > 0 ]] && printf '%d minutes ' $M
+    [[ $D > 0 || $H > 0 || $M > 0 ]] && printf 'and '
+    printf '%d seconds\n' $S
 }
 
 # DESC: Draw a progress bar
@@ -419,10 +419,10 @@ function downloadWeb() {
     local readonly commands=("wget" "grep" "uniq")
     checkBinary "${commands[@]}"
 
-	local readonly url="${1}"
-	local readonly file="${2}"
-	wget --no-check-certificate --progress=dot "${url}" -O "${file}" 2>&1 | grep --line-buffered -E -o "100%|[1-9]0%|^[^%]+$" | uniq
-	printVerbose "Download ${file}: ${Gre}DONE${RCol}"
+    local readonly url="${1}"
+    local readonly file="${2}"
+    wget --no-check-certificate --progress=dot "${url}" -O "${file}" 2>&1 | grep --line-buffered -E -o "100%|[1-9]0%|^[^%]+$" | uniq
+    printVerbose "Download ${file}: ${Gre}DONE${RCol}"
 }
 
 # DESC: Download file with Sftp
@@ -445,14 +445,42 @@ function downloadSftp() {
     local readonly pwd="${2:-22}"
     local readonly host="${3}"
     local readonly port="${4}"
-	local readonly remote_file="${5}"
-	local readonly local_file="${6}"
+    local readonly remote_file="${5}"
+    local readonly local_file="${6}"
     sshpass -p "${pwd}" sftp -oStrictHostKeyChecking=no -oPort="${port}" "${user}@${host}:${remote_file}" "${local_file}"
 
     if [[ -f "${local_file}" ]]; then
-	    printVerbose "SFTP Download ${local_file}: ${Gre}DONE${RCol}"
+        printVerbose "SFTP Download ${local_file}: ${Gre}DONE${RCol}"
     else
         printVerbose "SFTP download: ${Red}something wrong with ${remote_file} ${RCol}"
     fi
+}
 
+# DESC: Extract archive file
+# ARGS: $1 (required): Archive file to extract.
+# OUTS: None
+# SOURCE: https://ostechnix.com/a-bash-function-to-extract-file-archives-of-various-types/
+function extract() {
+    if [[ $# -lt 1 ]]; then
+        exitScript "Missing required argument to ${FUNCNAME[0]}()!" 2
+    fi
+
+    if [[ -f $1 ]] ; then
+        case $1 in
+            *.tar.bz2) tar xvjf $1 ;;
+            *.tar.gz) tar xvzf $1 ;;
+            *.bz2) bunzip2 $1 ;;
+            *.rar) rar x $1 ;;
+            *.gz) gunzip $1 ;;
+            *.tar) tar xvf $1 ;;
+            *.tbz2) tar xvjf $1 ;;
+            *.tgz) tar xvzf $1 ;;
+            *.zip) unzip $1 ;;
+            *.Z) uncompress $1 ;;
+            *.7z) 7z x $1 ;;
+            *) printError "Archive format unknown: '$1'" ;;
+        esac
+    else
+        printError "'$1' is not a valid file!"
+    fi
 }
