@@ -28,7 +28,7 @@ CREATE TABLE gn_imports.:trImportTable AS
         NULL::TIMESTAMP AS meta_update_date,
         NULL::BPCHAR(1) AS meta_last_action
     FROM taxonomie.bib_taxref_rangs
-WITH NO DATA ;
+    WITH NO DATA ;
 
 
 \echo '-------------------------------------------------------------------------------'

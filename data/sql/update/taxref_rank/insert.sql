@@ -40,7 +40,7 @@ BEGIN
             code,
             label,
             label_en,
-            "level",
+            "level"
         FROM gn_imports.${trImportTable} AS btrit
         WHERE btrit.meta_last_action = 'I'
             AND NOT EXISTS (

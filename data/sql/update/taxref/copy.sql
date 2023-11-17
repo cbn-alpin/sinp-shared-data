@@ -25,12 +25,12 @@ CREATE TABLE gn_imports.:taxrefImportTable AS
         id_rang AS rank_code,
         regne AS kingdom,
         phylum,
-        classe AS class,
-        ordre AS order,
+        classe AS "class",
+        ordre AS "order",
         famille AS family,
         sous_famille AS subfamily,
         tribu AS tribe,
-        cd_taxsup AS higher_taxon_code_shorter,
+        cd_taxsup AS higher_taxon_code_short,
         cd_sup AS higher_taxon_code_full,
         cd_ref AS taxon_code,
         lb_nom AS sciname_short,
@@ -89,8 +89,8 @@ COPY gn_imports.:taxrefImportTable (
     rank_code,
     kingdom,
     phylum,
-    class,
-    order,
+    "class",
+    "order",
     family,
     subfamily,
     tribe,
@@ -116,7 +116,7 @@ COPY gn_imports.:taxrefImportTable (
 FROM :'csvFilePath'
 WITH (
     FORMAT CSV, HEADER, DELIMITER E'\t',
-    FORCE_NULL (phylum, class, order, family, subfamily, tribe, sciname_short, sciname_valid, vernacular_name, vernacular_name_en)
+    FORCE_NULL (phylum, "class", "order", family, subfamily, tribe, sciname_short, sciname_valid, vernacular_name, vernacular_name_en)
 );
 
 \echo '----------------------------------------------------------------------------'
