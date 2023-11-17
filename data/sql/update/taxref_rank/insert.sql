@@ -37,16 +37,16 @@ BEGIN
             tri_rang
         )
         SELECT
-            id_rang,
-            nom_rang,
-            nom_rang_en,
-            tri_rang
+            code,
+            label,
+            label_en,
+            "level",
         FROM gn_imports.${trImportTable} AS btrit
         WHERE btrit.meta_last_action = 'I'
             AND NOT EXISTS (
                 SELECT 'X'
                 FROM taxonomie.bib_taxref_rangs AS btr
-                WHERE btr.id_rang = btrit.id_rang
+                WHERE btr.id_rang = btrit.code
             )
         ORDER BY btrit.gid ASC
         -- With NOT EXISTS don't use OFFSET because it's eliminate previously inserted rows.

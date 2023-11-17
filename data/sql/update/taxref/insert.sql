@@ -54,41 +54,41 @@ BEGIN
             nom_vern_eng,
             group1_inpn,
             group2_inpn,
-            "url",
-            group3_inpn
+            group3_inpn,
+            "url"
         )
         SELECT
-            cd_nom,
-            id_statut,
-            id_habitat,
-            id_rang,
-            regne,
+            sciname_code,
+            biogeographic_status_code,
+            habitat_type_code,
+            rank_code,
+            kingdom,
             phylum,
-            classe,
-            ordre,
-            famille,
-            sous_famille,
-            tribu,
-            cd_taxsup,
-            cd_sup,
-            cd_ref,
-            lb_nom,
-            lb_auteur,
-            nom_complet,
-            nom_complet_html,
-            nom_valide,
-            nom_vern,
-            nom_vern_eng,
-            group1_inpn,
-            group2_inpn,
-            "url",
-            group3_inpn
+            class,
+            order,
+            family,
+            subfamily,
+            tribe,
+            higher_taxon_code_short,
+            higher_taxon_code_full,
+            taxon_code,
+            sciname_short,
+            sciname_author,
+            sciname,
+            sciname_html,
+            sciname_valid,
+            vernacular_name,
+            vernacular_name_en,
+            inpn_group1_label,
+            inpn_group2_label,
+            inpn_group3_label,
+            inpn_url
         FROM gn_imports.${taxrefImportTable} AS sit
         WHERE sit.meta_last_action = 'I'
             AND NOT EXISTS (
                 SELECT 'X'
                 FROM taxonomie.taxref AS ts
-                WHERE ts.cd_nom = sit.cd_nom
+                WHERE ts.cd_nom = sit.sciname_code
             )
         ORDER BY sit.gid ASC
         -- With NOT EXISTS don't use OFFSET because it's eliminate previously inserted rows.

@@ -19,10 +19,11 @@ DROP TABLE IF EXISTS gn_imports.:trImportTable ;
 CREATE TABLE gn_imports.:trImportTable AS
     SELECT
         NULL::INT AS gid,
-        id_rang,
-        nom_rang,
-        nom_rang_en,
-        tri_rang,
+        id_rang AS code,
+        nom_rang AS label,
+        nom_rang_en AS label_en,
+        tri_rang AS "level",
+        NULL::jsonb AS additional_data,
         NULL::TIMESTAMP AS meta_create_date,
         NULL::TIMESTAMP AS meta_update_date,
         NULL::BPCHAR(1) AS meta_last_action
@@ -46,16 +47,17 @@ ALTER TABLE gn_imports.:trImportTable OWNER TO :gnDbOwner ;
 \echo '-------------------------------------------------------------------------------'
 \echo 'Copy CSV file to import taxref_rank table'
 COPY gn_imports.:trImportTable (
-    id_rang,
-    nom_rang,
-    nom_rang_en,
-    tri_rang,
+    code,
+    label,
+    label_en,
+    "level",
+    additional_data,
     meta_create_date,
     meta_update_date,
     meta_last_action
 )
 FROM :'csvFilePath'
-WITH (FORMAT CSV, HEADER, DELIMITER E'\t', FORCE_NULL (nom_rang_en));
+WITH (FORMAT CSV, HEADER, DELIMITER E'\t', FORCE_NULL (label_en));
 
 
 \echo '----------------------------------------------------------------------------'

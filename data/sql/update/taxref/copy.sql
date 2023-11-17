@@ -19,31 +19,32 @@ DROP TABLE IF EXISTS gn_imports.:taxrefImportTable ;
 CREATE TABLE gn_imports.:taxrefImportTable AS
     SELECT
         NULL::INT AS gid,
-        cd_nom,
-        id_statut,
-        id_habitat,
-        id_rang,
-        regne,
+        cd_nom AS sciname_code,
+        id_statut AS biogeographic_status_code,
+        id_habitat AS habitat_type_code,
+        id_rang AS rank_code,
+        regne AS kingdom,
         phylum,
-        classe,
-        ordre,
-        famille,
-        sous_famille,
-        tribu,
-        cd_taxsup,
-        cd_sup,
-        cd_ref,
-        lb_nom,
-        lb_auteur,
-        nom_complet,
-        nom_complet_html,
-        nom_valide,
-        nom_vern,
-        nom_vern_eng,
-        group1_inpn,
-        group2_inpn,
-        "url",
-        group3_inpn,
+        classe AS class,
+        ordre AS order,
+        famille AS family,
+        sous_famille AS subfamily,
+        tribu AS tribe,
+        cd_taxsup AS higher_taxon_code_shorter,
+        cd_sup AS higher_taxon_code_full,
+        cd_ref AS taxon_code,
+        lb_nom AS sciname_short,
+        lb_auteur AS sciname_author,
+        nom_complet AS sciname,
+        nom_complet_html AS sciname_html,
+        nom_valide AS sciname_valid,
+        nom_vern AS vernacular_name,
+        nom_vern_eng AS vernacular_name_en,
+        group1_inpn AS inpn_group1_label,
+        group2_inpn AS inpn_group2_label,
+        group3_inpn AS inpn_group3_label,
+        "url" AS inpn_url,
+        NULL::JSONB AS additional_data,
         NULL::TIMESTAMP AS meta_create_date,
         NULL::TIMESTAMP AS meta_update_date,
         NULL::BPCHAR(1) AS meta_last_action
@@ -61,9 +62,9 @@ ALTER TABLE gn_imports.:taxrefImportTable
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Create indexes on imports taxref table'
-\set cdNomIdx 'idx_unique_':taxrefImportTable'_cdNom'
-CREATE UNIQUE INDEX :cdNomIdx
-    ON gn_imports.:taxrefImportTable USING btree (cd_nom);
+\set scinameCodeIdx 'idx_unique_':taxrefImportTable'_sciname_code'
+CREATE UNIQUE INDEX :scinameCodeIdx
+    ON gn_imports.:taxrefImportTable USING btree (sciname_code);
 
 \set updateDateIdx 'idx_':taxrefImportTable'_meta_update_date'
 CREATE INDEX :updateDateIdx
@@ -82,38 +83,41 @@ ALTER TABLE gn_imports.:taxrefImportTable OWNER TO :gnDbOwner ;
 \echo '-------------------------------------------------------------------------------'
 \echo 'Copy CSV file to import taxref table'
 COPY gn_imports.:taxrefImportTable (
-    cd_nom,
-    id_statut,
-    id_habitat,
-    id_rang,
-    regne,
+    sciname_code,
+    biogeographic_status_code,
+    habitat_type_code,
+    rank_code,
+    kingdom,
     phylum,
-    classe,
-    ordre,
-    famille,
-    sous_famille,
-    tribu,
-    cd_taxsup,
-    cd_sup,
-    cd_ref,
-    lb_nom,
-    lb_auteur,
-    nom_complet,
-    nom_complet_html,
-    nom_valide,
-    nom_vern,
-    nom_vern_eng,
-    group1_inpn,
-    group2_inpn,
-    "url",
-    group3_inpn,
+    class,
+    order,
+    family,
+    subfamily,
+    tribe,
+    higher_taxon_code_short,
+    higher_taxon_code_full,
+    taxon_code,
+    sciname_short,
+    sciname_author,
+    sciname,
+    sciname_html,
+    sciname_valid,
+    vernacular_name,
+    vernacular_name_en,
+    inpn_group1_label,
+    inpn_group2_label,
+    inpn_group3_label,
+    inpn_url,
+    additional_data,
     meta_create_date,
     meta_update_date,
     meta_last_action
 )
 FROM :'csvFilePath'
-WITH (FORMAT CSV, HEADER, DELIMITER E'\t', FORCE_NULL (phylum, classe, ordre, famille, sous_famille, tribu, lb_auteur, nom_valide, nom_vern, nom_vern_eng));
-
+WITH (
+    FORMAT CSV, HEADER, DELIMITER E'\t',
+    FORCE_NULL (phylum, class, order, family, subfamily, tribe, sciname_short, sciname_valid, vernacular_name, vernacular_name_en)
+);
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
