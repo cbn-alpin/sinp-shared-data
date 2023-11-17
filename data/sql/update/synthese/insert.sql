@@ -208,21 +208,20 @@ ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_meta_dates_change_synthese ;
 \echo 'Enable trigger "tri_insert_calculate_sensitivity"'
 ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_insert_calculate_sensitivity ;
 
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Insert data into cor_observer_synthese'
-
 INSERT INTO gn_synthese.cor_observer_synthese (id_synthese, id_role)
-    SELECT distinct
+    SELECT DISTINCT
         s.id_synthese,
         t.id_role
-    from gn_imports.${syntheseImportTable} sit
-    JOIN gn_synthese.synthese s
+    FROM gn_imports.${syntheseImportTable} AS sit
+        JOIN gn_synthese.synthese s
             ON s.unique_id_sinp = sit.unique_id_sinp
-    cross join lateral regexp_matches(sit.observers, '\[(.*?)\]', 'g') as MATCH
-    JOIN utilisateurs.t_roles t
+        CROSS JOIN LATERAL regexp_matches(sit.observers, '\[(.*?)\]', 'g') AS match
+        JOIN utilisateurs.t_roles t
             ON t.uuid_role::text = match[1]
 ON CONFLICT ON CONSTRAINT pk_cor_observer_synthese DO NOTHING ;
-
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
