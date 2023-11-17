@@ -447,12 +447,45 @@ function downloadSftp() {
     local readonly port="${4}"
     local readonly remote_file="${5}"
     local readonly local_file="${6}"
-    sshpass -p "${pwd}" sftp -oStrictHostKeyChecking=no -oPort="${port}" "${user}@${host}:${remote_file}" "${local_file}"
+    sshpass -p "${pwd}" sftp -oStrictHostKeyChecking=no -oPort="${port}" \
+        "${user}@${host}:${remote_file}" "${local_file}"
 
     if [[ -f "${local_file}" ]]; then
-        printVerbose "SFTP Download ${local_file}: ${Gre}DONE${RCol}"
+        printVerbose "SFTP download ${local_file}: ${Gre}DONE${RCol}"
     else
         printVerbose "SFTP download: ${Red}something wrong with ${remote_file} ${RCol}"
+    fi
+}
+
+# DESC: Upload file with Sftp
+# ARGS: $1 (required): user name
+# ARGS: $2 (required): user password
+# ARGS: $3 (required): sftp host server IP address
+# ARGS: $4 (required): sftp host server if not equal to 22
+# ARGS: $5 (required): path of remote directory where to upload the file
+# ARGS: $6 (required): path of local file to upload
+# OUTS: None
+# SOURCE: -
+function uploadSftp() {
+    if [[ $# -lt 6 ]]; then
+        exitScript 'Missing required argument to upload()!' 6
+    fi
+    local readonly commands=("sshpass" "sftp")
+    checkBinary "${commands[@]}"
+
+    local readonly user="${1}"
+    local readonly pwd="${2:-22}"
+    local readonly host="${3}"
+    local readonly port="${4}"
+    local readonly remote_dir="${5}"
+    local readonly local_file="${6}"
+    sshpass -p "${pwd}" sftp -oStrictHostKeyChecking=no -oPort="${port}" \
+        "${user}@${host}:${remote_dir}" <<< "put ${local_file}"
+
+    if [[ -f "${local_file}" ]]; then
+        printVerbose "${Gra}SFTP upload ${local_file}: ${Gre}DONE${RCol}"
+    else
+        printVerbose "${Gra}SFTP upload: ${Red}something wrong with ${remote_file} ${RCol}"
     fi
 }
 
