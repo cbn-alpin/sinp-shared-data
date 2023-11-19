@@ -261,68 +261,101 @@ $function$ ;
 CREATE OR REPLACE FUNCTION gn_imports.computeImportTotal(
     tableImport VARCHAR, actionImport VARCHAR, OUT total integer
 )
-LANGUAGE plpgsql AS $$
-DECLARE
-	schemaImport VARCHAR ;
-	parsed_ident VARCHAR[] ;
-    parsed_count INT ;
-BEGIN
-    parsed_ident := parse_ident(tableImport) ;
-    parsed_count := array_length(parsed_ident, 1) ;
+LANGUAGE plpgsql AS $function$
+    DECLARE
+        schemaImport VARCHAR ;
+        parsed_ident VARCHAR[] ;
+        parsed_count INT ;
+    BEGIN
+        parsed_ident := parse_ident(tableImport) ;
+        parsed_count := array_length(parsed_ident, 1) ;
 
-    IF parsed_count = 2 THEN
-        SELECT parsed_ident[1] INTO schemaImport ;
-        SELECT parsed_ident[2] INTO tableImport ;
-    ELSIF parsed_count = 1 THEN
-        schemaImport := 'gn_imports' ;
-        SELECT parsed_ident[1] INTO tableImport ;
-    END IF;
+        IF parsed_count = 2 THEN
+            SELECT parsed_ident[1] INTO schemaImport ;
+            SELECT parsed_ident[2] INTO tableImport ;
+        ELSIF parsed_count = 1 THEN
+            schemaImport := 'gn_imports' ;
+            SELECT parsed_ident[1] INTO tableImport ;
+        END IF;
 
-    --RAISE NOTICE 'Schema %, table %', schemaImport, tableImport ;
-    EXECUTE format(
-        'SELECT COUNT(*) FROM %I.%I WHERE meta_last_action = $1 ',
-        schemaImport, tableImport
-    ) USING actionImport INTO total ;
-END;
-$$;
+        --RAISE NOTICE 'Schema %, table %', schemaImport, tableImport ;
+        EXECUTE format(
+            'SELECT COUNT(*) FROM %I.%I WHERE meta_last_action = $1 ',
+            schemaImport, tableImport
+        ) USING actionImport INTO total ;
+    END;
+$function$;
 
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "computeImportStep()"'
 CREATE OR REPLACE FUNCTION gn_imports.computeImportStep(total INT)
 RETURNS INT
-LANGUAGE plpgsql AS $$
-BEGIN
-    IF total <= 100000 THEN
-        RETURN 10000;
-    ELSIF total > 100000 AND total <= 2500000 THEN
-        RETURN 100000;
-    ELSIF total > 2500000 THEN
-        RETURN 500000;
-    END IF;
-END;
-$$;
+LANGUAGE plpgsql
+AS
+$function$
+    BEGIN
+        IF total <= 100000 THEN
+            RETURN 10000;
+        ELSIF total > 100000 AND total <= 2500000 THEN
+            RETURN 100000;
+        ELSIF total > 2500000 THEN
+            RETURN 500000;
+        END IF;
+    END;
+$function$;
 
 \echo '-------------------------------------------------------------------------------'
-\echo 'Set function "clean_uuid_observers()"'
-CREATE OR REPLACE FUNCTION public.clean_uuid_observers(observersImported varchar)
- RETURNS text
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-	DECLARE
-		observersExported text;
-
-	BEGIN
-		observersExported := '';
-
-		SELECT INTO observersExported
-			regexp_replace(observersImported,'[\s]\[(.*?)\]','','g');
-
-		RETURN observersExported;
-	END;
+\echo 'Set function "clean_observers_uuid()"'
+CREATE OR REPLACE FUNCTION gn_imports.clean_observers_uuid(observersImported varchar)
+    RETURNS text
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+AS
 $function$
-;
+    --
+    DECLARE
+        observersExported text;
+
+    BEGIN
+        observersExported := '';
+
+        SELECT INTO observersExported
+            regexp_replace(observersImported,'[\s]\[(.*?)\]','','g');
+
+        RETURN observersExported;
+    END;
+$function$ ;
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "extract_observers_uuid()"'
+CREATE OR REPLACE FUNCTION gn_imports.extract_observers_uuid(varchar)
+    RETURNS uuid[]
+    LANGUAGE plpgsql
+    RETURNS NULL ON NULL INPUT
+AS
+$function$
+    -- Extract the UUID enclosed in square brackets for each  comma-separated observer string.
+    DECLARE
+        observersStr ALIAS FOR $1;
+        observers varchar[];
+        observer varchar;
+        extracted_uuid varchar;
+        observersUuids uuid[];
+
+    BEGIN
+        observers = string_to_array(observersStr, '[');
+        FOR idx IN array_lower(observers, 1)..array_upper(observers, 1) LOOP
+            observer = observers[idx];
+            -- Avoid to use string was not an UUID (UUID = 36 characters)
+            IF POSITION(']' IN observer) = 37 THEN
+                extracted_uuid = substring(observer, 1, 36);
+                observersUuids[idx] := CAST(extracted_uuid AS uuid);
+            END IF;
+        END LOOP;
+        RETURN observersUuids;
+    END;
+$function$ ;
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'

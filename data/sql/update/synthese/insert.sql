@@ -163,7 +163,7 @@ BEGIN
             validator,
             validation_comment,
             validation_date,
-            public.clean_uuid_observers(observers),
+            gn_imports.clean_observers_uuid(observers),
             determiner,
             id_digitiser,
             id_nomenclature_determination_method,
@@ -210,18 +210,60 @@ ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_insert_calculate_sensitivity
 
 
 \echo '-------------------------------------------------------------------------------'
+\echo 'Delete temporary table "observers_uuid"'
+DROP TABLE IF EXISTS gn_imports.observers_uuid;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Create temporary table "observers_uuid"'
+CREATE TABLE gn_imports.observers_uuid (
+    gid SERIAL CONSTRAINT pk_observers_uuid PRIMARY KEY,
+    observation_uuid UUID NOT NULL,
+    observation_id INT,
+    observer_uuid UUID NOT NULL,
+    observer_id INT
+);
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Insert data in temporary table "observers_uuid"'
+INSERT INTO gn_imports.observers_uuid (observation_uuid, observer_uuid)
+    SELECT
+        unique_id_sinp AS observation_uuid,
+        UNNEST(gn_imports.extract_observers_uuids(observers)) AS observer_uuid
+    FROM gn_imports.${syntheseImportTable} ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Create infexes for temporary table "observers_uuid"'
+CREATE INDEX "observers_observations_uuid_idx" ON gn_imports.observers_uuid USING btree(observation_uuid);
+CREATE INDEX "observers_observer_uuid_idx" ON gn_imports.observers_uuid USING btree(observer_uuid);
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Update observation_id for temporary table "observers_uuid"'
+UPDATE gn_imports.observers_uuid AS ou SET
+    observation_id = s.id_synthese
+FROM gn_synthese.synthese AS s
+WHERE s.unique_id_sinp = ou.observation_uuid ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Update observer_id for temporary table "observers_uuid"'
+UPDATE gn_imports.observers_uuid AS ou SET
+    observer_id = r.id_role
+FROM utilisateurs.t_roles AS r
+WHERE r.uuid_role = ou.observer_uuid ;
+
+
+\echo '-------------------------------------------------------------------------------'
 \echo 'Insert data into cor_observer_synthese'
 INSERT INTO gn_synthese.cor_observer_synthese (id_synthese, id_role)
-    SELECT DISTINCT
-        s.id_synthese,
-        t.id_role
-    FROM gn_imports.${syntheseImportTable} AS sit
-        JOIN gn_synthese.synthese s
-            ON s.unique_id_sinp = sit.unique_id_sinp
-        CROSS JOIN LATERAL regexp_matches(sit.observers, '\[(.*?)\]', 'g') AS match
-        JOIN utilisateurs.t_roles t
-            ON t.uuid_role::text = match[1]
+    SELECT
+        observation_id,
+        observer_id
+    FROM gn_imports.observers_uuid
 ON CONFLICT ON CONSTRAINT pk_cor_observer_synthese DO NOTHING ;
+
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
