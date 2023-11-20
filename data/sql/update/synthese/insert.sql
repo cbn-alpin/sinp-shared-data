@@ -229,7 +229,7 @@ CREATE TABLE gn_imports.observers_uuid (
 INSERT INTO gn_imports.observers_uuid (observation_uuid, observer_uuid)
     SELECT
         unique_id_sinp AS observation_uuid,
-        UNNEST(gn_imports.extract_observers_uuids(observers)) AS observer_uuid
+        UNNEST(gn_imports.extract_observers_uuid(observers)) AS observer_uuid
     FROM gn_imports.${syntheseImportTable} ;
 
 
