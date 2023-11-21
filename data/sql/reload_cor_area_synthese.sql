@@ -57,6 +57,7 @@ CREATE TABLE ref_geo.tmp_subdivided_areas AS
     FROM ref_geo.l_areas AS a
     WHERE a."enable" = TRUE
         AND a.id_type IN (
+            ref_geo.get_id_area_type('REG'), -- Régions
             ref_geo.get_id_area_type('DEP'), -- Départements
             ref_geo.get_id_area_type('COM') -- Communes
         ) ;
@@ -80,6 +81,7 @@ WHERE id_area IN (
     SELECT id_area
     FROM ref_geo.l_areas
     WHERE id_type IN (
+        ref_geo.get_id_area_type('REG'), -- Régions
         ref_geo.get_id_area_type('DEP'), -- Départements
         ref_geo.get_id_area_type('COM') -- Communes
     )
