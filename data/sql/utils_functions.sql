@@ -327,35 +327,6 @@ $function$
     END;
 $function$ ;
 
-\echo '-------------------------------------------------------------------------------'
-\echo 'Set function "extract_observers_uuid()"'
-CREATE OR REPLACE FUNCTION gn_imports.extract_observers_uuid(varchar)
-    RETURNS uuid[]
-    LANGUAGE plpgsql
-    RETURNS NULL ON NULL INPUT
-AS
-$function$
-    -- Extract the UUID enclosed in square brackets for each  comma-separated observer string.
-    DECLARE
-        observersStr ALIAS FOR $1;
-        observers varchar[];
-        observer varchar;
-        extracted_uuid varchar;
-        observersUuids uuid[];
-
-    BEGIN
-        observers = string_to_array(observersStr, '[');
-        FOR idx IN array_lower(observers, 1)..array_upper(observers, 1) LOOP
-            observer = observers[idx];
-            -- Avoid to use string was not an UUID (UUID = 36 characters)
-            IF POSITION(']' IN observer) = 37 THEN
-                extracted_uuid = substring(observer, 1, 36);
-                observersUuids[idx] := CAST(extracted_uuid AS uuid);
-            END IF;
-        END LOOP;
-        RETURN observersUuids;
-    END;
-$function$ ;
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'

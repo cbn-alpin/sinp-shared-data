@@ -209,60 +209,46 @@ ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_meta_dates_change_synthese ;
 ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_insert_calculate_sensitivity ;
 
 
-\echo '-------------------------------------------------------------------------------'
-\echo 'Delete temporary table "observers_uuid"'
-DROP TABLE IF EXISTS gn_imports.observers_uuid;
+\echo '----------------------------------------------------------------------------'
+\echo 'Disable foreigns keys and triggers on gn_synthese.cor_observer_synthese'
+ALTER TABLE gn_synthese.cor_observer_synthese DISABLE TRIGGER trg_maj_synthese_observers_txt;
 
+ALTER TABLE gn_synthese.cor_observer_synthese DROP CONSTRAINT fk_gn_synthese_id_role ;
 
-\echo '-------------------------------------------------------------------------------'
-\echo 'Create temporary table "observers_uuid"'
-CREATE TABLE gn_imports.observers_uuid (
-    gid SERIAL CONSTRAINT pk_observers_uuid PRIMARY KEY,
-    observation_uuid UUID NOT NULL,
-    observation_id INT,
-    observer_uuid UUID NOT NULL,
-    observer_id INT
-);
-
-\echo '-------------------------------------------------------------------------------'
-\echo 'Insert data in temporary table "observers_uuid"'
-INSERT INTO gn_imports.observers_uuid (observation_uuid, observer_uuid)
-    SELECT
-        unique_id_sinp AS observation_uuid,
-        UNNEST(gn_imports.extract_observers_uuid(observers)) AS observer_uuid
-    FROM gn_imports.${syntheseImportTable} ;
-
-
-\echo '-------------------------------------------------------------------------------'
-\echo 'Create infexes for temporary table "observers_uuid"'
-CREATE INDEX "observers_observations_uuid_idx" ON gn_imports.observers_uuid USING btree(observation_uuid);
-CREATE INDEX "observers_observer_uuid_idx" ON gn_imports.observers_uuid USING btree(observer_uuid);
-
-
-\echo '-------------------------------------------------------------------------------'
-\echo 'Update observation_id for temporary table "observers_uuid"'
-UPDATE gn_imports.observers_uuid AS ou SET
-    observation_id = s.id_synthese
-FROM gn_synthese.synthese AS s
-WHERE s.unique_id_sinp = ou.observation_uuid ;
-
-
-\echo '-------------------------------------------------------------------------------'
-\echo 'Update observer_id for temporary table "observers_uuid"'
-UPDATE gn_imports.observers_uuid AS ou SET
-    observer_id = r.id_role
-FROM utilisateurs.t_roles AS r
-WHERE r.uuid_role = ou.observer_uuid ;
+ALTER TABLE gn_synthese.cor_observer_synthese DROP CONSTRAINT fk_gn_synthese_id_synthese ;
 
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Insert data into cor_observer_synthese'
 INSERT INTO gn_synthese.cor_observer_synthese (id_synthese, id_role)
-    SELECT
-        observation_id,
-        observer_id
-    FROM gn_imports.observers_uuid
+    WITH observers_uuid AS (
+        SELECT
+            unique_id_sinp AS observation_uuid,
+            UNNEST(regexp_matches(observers, '\[([-0-9a-fA-F]{36})\]', 'g'))::uuid AS observer_uuid
+        FROM gn_imports.${syntheseImportTable}
+    )
+    SELECT DISTINCT
+        s.id_synthese,
+        r.id_role
+    FROM observers_uuid AS ou
+        JOIN gn_synthese.synthese AS s
+            ON s.unique_id_sinp = ou.observation_uuid
+        JOIN utilisateurs.t_roles AS r
+            ON r.uuid_role = ou.observer_uuid
 ON CONFLICT ON CONSTRAINT pk_cor_observer_synthese DO NOTHING ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Enable foreigns keys and triggers on gn_synthese.cor_observer_synthese'
+ALTER TABLE gn_synthese.cor_observer_synthese ENABLE TRIGGER trg_maj_synthese_observers_txt;
+
+ALTER TABLE gn_synthese.cor_observer_synthese ADD CONSTRAINT fk_gn_synthese_id_role
+    FOREIGN KEY (id_role) REFERENCES utilisateurs.t_roles(id_role)
+    ON UPDATE CASCADE ;
+
+ALTER TABLE gn_synthese.cor_observer_synthese ADD CONSTRAINT fk_gn_synthese_id_synthese
+    FOREIGN KEY (id_synthese) REFERENCES gn_synthese.synthese(id_synthese)
+    ON UPDATE CASCADE ON DELETE CASCADE ;
 
 
 \echo '----------------------------------------------------------------------------'
