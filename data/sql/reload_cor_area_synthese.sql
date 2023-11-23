@@ -40,15 +40,15 @@ $$ ;
 
 
 \echo '----------------------------------------------------------------------------'
-\echo 'Create subdivided DEP and COM areas table for faster cor_area_synthese reinsert'
+\echo 'Create subdivided REG, DEP and COM areas table for faster cor_area_synthese reinsert'
 
-\echo ' Remove subdivided DEP and COM areas table if necessary'
+\echo ' Remove subdivided REG, DEP and COM areas table if necessary'
 DROP TABLE IF EXISTS ref_geo.tmp_subdivided_areas ;
 
-\echo ' Remove geom index on subdivided DEP and COM areas table'
+\echo ' Remove geom index on subdivided REG, DEP and COM areas table'
 DROP INDEX IF EXISTS ref_geo.idx_tmp_subdivided_areas ;
 
-\echo ' Add subdivided DEP and COM areas table'
+\echo ' Add subdivided REG, DEP and COM areas table'
 CREATE TABLE ref_geo.tmp_subdivided_areas AS
     SELECT
         random() AS gid,
@@ -62,10 +62,10 @@ CREATE TABLE ref_geo.tmp_subdivided_areas AS
             ref_geo.get_id_area_type('COM') -- Communes
         ) ;
 
-\echo ' Create index on geom column for subdivided DEP and COM areas table'
+\echo ' Create index on geom column for subdivided REG, DEP and COM areas table'
 CREATE INDEX IF NOT EXISTS idx_tmp_subdivided_geom ON ref_geo.tmp_subdivided_areas USING gist (geom);
 
-\echo ' Create index on column id_area for subdivided DEP and COM areas table'
+\echo ' Create index on column id_area for subdivided REG, DEP and COM areas table'
 CREATE INDEX IF NOT EXISTS idx_tmp_subdivided_area_id ON ref_geo.tmp_subdivided_areas USING btree(area_id) ;
 
 
@@ -75,7 +75,7 @@ CREATE INDEX IF NOT EXISTS idx_tmp_subdivided_area_id ON ref_geo.tmp_subdivided_
 -- TRUNCATE TABLE cor_area_synthese ;
 -- TO AVOID TRUNCATE : add condition on id_source or id_dataset to reduce synthese table entries in below inserts
 
-\echo ' Clean Départements and Communes in table cor_area_synthese'
+\echo ' Clean Régions, Départements and Communes in table cor_area_synthese'
 DELETE FROM gn_synthese.cor_area_synthese
 WHERE id_area IN (
     SELECT id_area
@@ -87,7 +87,7 @@ WHERE id_area IN (
     )
 ) ;
 
-\echo ' Reinsert Départements and Communes'
+\echo ' Reinsert Régions, Départements and Communes'
 -- ~35mn for ~1,000 areas and ~6,000,000 of rows in synthese table on SSD NVME disk
 INSERT INTO gn_synthese.cor_area_synthese
     SELECT DISTINCT
