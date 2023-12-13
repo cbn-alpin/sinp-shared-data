@@ -160,7 +160,7 @@ BEGIN
             id_area_attachment,
             date_min,
             date_max,
-            validator,
+            gn_imports.clean_observers_uuid(validator),
             validation_comment,
             validation_date,
             gn_imports.clean_observers_uuid(observers),
