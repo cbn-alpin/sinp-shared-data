@@ -18,25 +18,30 @@ DROP TABLE IF EXISTS gn_imports.:roImportTable ;
 CREATE TABLE gn_imports.:roImportTable AS
     SELECT
         NULL::INT AS gid,
-        unique_acquisition_framework_id AS unique_id,
-        acquisition_framework_name AS name,
-        acquisition_framework_desc AS description,
-        id_nomenclature_territorial_level,
-        territory_desc,
-        keywords,
-        id_nomenclature_financing_type,
-        target_description,
-        ecologic_or_geologic_target,
-        NULL::VARCHAR(255) AS parent_code,
-        is_parent,
-        acquisition_framework_start_date AS start_date,
-        acquisition_framework_end_date AS end_date,
-        NULL::VARCHAR(255)[] AS cor_objectifs,
-        NULL::VARCHAR(255)[] AS cor_voletsinp,
-        NULL::VARCHAR(255)[][] AS cor_actors_organism,
-        NULL::VARCHAR(255)[][] AS cor_actors_user,
-        NULL::JSONB AS cor_publications,
-        NULL::JSONB AS additional_data,
+        unique_id_sinp_grp,
+        id_dataset,
+        id_digitiser,
+        observers_txt AS observers,
+        id_nomenclature_tech_collect_camp AS code_nomenclature_obs_technique,
+        id_nomemclature_grp_typ,
+        grp_method,
+        date_min,
+        date_max,
+        hour_min,
+        hour_max,
+        cd_hab,
+        altitude_min,
+        altitude_max,
+        depth_min,
+        depth_max,
+        place_name,
+        meta_device_entry,
+        comment AS comment_context,
+        geom_local AS geom,
+        geom_4326 AS geom,
+        id_nomenclature_geo_object_nature,
+        precision,
+        additional_fields,
         NULL::TIMESTAMP AS meta_create_date,
         NULL::TIMESTAMP AS meta_update_date,
         NULL::BPCHAR(1) AS meta_last_action
@@ -54,11 +59,7 @@ ALTER TABLE gn_imports.:roImportTable
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Create indexes on imports releves occtax table'
-\set nameIdx 'idx_unique_':roImportTable'_name'
-CREATE UNIQUE INDEX :nameIdx
-    ON gn_imports.:roImportTable USING btree (name);
-
-\set uniqueIdIdx 'idx_unique_':roImportTable'_unique_id'
+\set uniqueIdIdx 'idx_unique_':roImportTable'_unique_id_sinp_grp'
 CREATE UNIQUE INDEX :uniqueIdIdx
     ON gn_imports.:roImportTable USING btree (unique_id);
 
@@ -79,27 +80,29 @@ ALTER TABLE gn_imports.:roImportTable OWNER TO :gnDbOwner ;
 \echo '-------------------------------------------------------------------------------'
 \echo 'Copy CVS file to import releves occtax table'
 COPY gn_imports.:roImportTable (
-    unique_id,
-    name,
-    description,
-    id_nomenclature_territorial_level,
-    territory_desc,
-    keywords,
-    id_nomenclature_financing_type,
-    target_description,
-    ecologic_or_geologic_target,
-    parent_code,
-    is_parent,
-    start_date,
-    end_date,
-    cor_objectifs,
-    cor_voletsinp,
-    cor_actors_organism,
-    cor_actors_user,
-    cor_publications,
-    additional_data,
-    meta_create_date,
-    meta_update_date,
+    unique_id_sinp_grp,
+    code_dataset,
+    code_digitiser,
+    observers,
+    code_nomenclature_obs_technique,
+    code_nomenclature_grp_typ,
+    grp_method,
+    date_min,
+    date_max,
+    hour_min,
+    hour_max,
+    cd_hab,
+    altitude_min,
+    altitude_max,
+    depth_min,
+    depth_max,
+    place_name,
+    meta_device_entry,
+    comment_context,
+    geom,
+    code_nomenclature_geo_object_nature,
+    precision,
+    additional_fields,
     meta_last_action
 )
 FROM :'csvFilePath'
