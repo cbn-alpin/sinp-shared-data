@@ -103,6 +103,8 @@ COPY gn_imports.:roImportTable (
     code_nomenclature_geo_object_nature,
     precision,
     additional_fields,
+    meta_create_date,
+    meta_update_date,
     meta_last_action
 )
 FROM :'csvFilePath'
