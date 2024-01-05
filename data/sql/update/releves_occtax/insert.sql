@@ -1,16 +1,16 @@
 BEGIN;
--- This file contain a variable "${afImportTable}" which must be replaced
+-- This file contain a variable "${roImportTable}" which must be replaced
 -- with "sed" before passing the updated content to psql.
 
 \echo '-------------------------------------------------------------------------------'
-\echo 'Insert imported acquisition frameworks with meta_last_action = I.'
+\echo 'Insert imported releves occtax with meta_last_action = I.'
 \echo 'Rights: db-owner'
 \echo 'GeoNature database compatibility : v2.4.1+'
 
 SET client_encoding = 'UTF8';
 
 \echo '-------------------------------------------------------------------------------'
-\echo 'Batch updating in "t_acquisition_frameworks" of the imported acquisition frameworks'
+\echo 'Batch updating in "t_releves_occtax" of the imported releves occtax'
 DO $$
 DECLARE
     step INTEGER ;
@@ -19,32 +19,43 @@ DECLARE
     affectedRows INTEGER;
 BEGIN
     -- Set dynamicly stopAt and step
-    stopAt := gn_imports.computeImportTotal('gn_imports.${afImportTable}', 'I') ;
+    stopAt := gn_imports.computeImportTotal('gn_imports.${roImportTable}', 'I') ;
     step := gn_imports.computeImportStep(stopAt) ;
     RAISE NOTICE 'Total found: %, step used: %', stopAt, step ;
 
-    RAISE NOTICE 'Start to loop on data to insert in "t_acquisition_frameworks" table' ;
+    RAISE NOTICE 'Start to loop on data to insert in "t_releves_occtax" table' ;
     WHILE offsetCnt < stopAt LOOP
 
         RAISE NOTICE '-------------------------------------------------' ;
-        RAISE NOTICE 'Try to insert % acquisition frameworks from %', step, offsetCnt ;
+        RAISE NOTICE 'Try to insert % releves occtax from %', step, offsetCnt ;
 
         RAISE NOTICE '-------------------------------------------------' ;
-        RAISE NOTICE 'Inserting PARENT acquisition frameworks data to "t_acquisition_frameworks" if not exist' ;
-        INSERT INTO gn_meta.t_acquisition_frameworks (
-            unique_acquisition_framework_id,
-            acquisition_framework_name,
-            acquisition_framework_desc,
-            id_nomenclature_territorial_level,
-            territory_desc,
-            keywords,
-            id_nomenclature_financing_type,
-            target_description,
-            ecologic_or_geologic_target,
-            acquisition_framework_parent_id,
-            is_parent,
-            acquisition_framework_start_date,
-            acquisition_framework_end_date,
+        RAISE NOTICE 'Inserting releves occtax data to "t_releves_occtax" if not exist' ;
+        INSERT INTO pr_occtax.t_releves_occtax (
+            unique_id_sinp_grp,
+            id_dataset,
+            id_digitiser,
+            observers_txt,
+            id_nomenclature_tech_collect_campanule,
+            id_nomenclature_grp_typ,
+            grp_method,
+            date_min,
+            date_max,
+            hour_min,
+            hour_max,
+            cd_hab,
+            altitude_min,
+            altitude_max,
+            depth_min,
+            depth_max,
+            place_name,
+            meta_device_entry,
+            comment,
+            geom_local,
+            geom_4326,
+            id_nomenclature_geo_object_nature,
+            precision,
+            additional_fields,
             meta_create_date,
             meta_update_date
         )
@@ -64,7 +75,7 @@ BEGIN
             end_date,
             meta_create_date,
             meta_update_date
-        FROM gn_imports.${afImportTable} AS afit
+        FROM gn_imports.${roImportTable} AS afit
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM gn_meta.t_acquisition_frameworks AS taf
