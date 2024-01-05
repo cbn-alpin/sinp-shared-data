@@ -22,7 +22,7 @@ CREATE TABLE gn_imports.:roImportTable AS
         id_dataset,
         id_digitiser,
         observers_txt AS observers,
-        id_nomenclature_tech_collect_camp AS code_nomenclature_obs_technique,
+        id_nomenclature_tech_collect_campanule AS code_nomenclature_obs_technique,
         id_nomemclature_grp_typ,
         grp_method,
         date_min,
