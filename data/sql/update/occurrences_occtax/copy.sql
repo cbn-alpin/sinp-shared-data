@@ -18,8 +18,7 @@ DROP TABLE IF EXISTS gn_imports.:ooImportTable ;
 CREATE TABLE gn_imports.:ooImportTable AS
     SELECT
         NULL::INT AS gid,
-        unique_id_occurence_occtax,
-        id_releve_occtax,
+        unique_id_occurence_occtax AS unique_id_sinp_occtax,
         id_nomenclature_obs_technique,
         id_nomenclature_bio_condition,
         id_nomenclature_bio_status,
@@ -57,9 +56,9 @@ ALTER TABLE gn_imports.:ooImportTable
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Create indexes on imports occurrences occtax table'
-\set uniqueIdIdx 'idx_unique_':ooImportTable'_unique_id_sinp_grp'
+\set uniqueIdIdx 'idx_unique_':ooImportTable'_unique_id_occurence_occtax'
 CREATE UNIQUE INDEX :uniqueIdIdx
-    ON gn_imports.:ooImportTable USING btree (unique_id);
+    ON gn_imports.:ooImportTable USING btree (unique_id_occurence_occtax);
 
 \set updateDateIdx 'idx_':ooImportTable'_meta_update_date'
 CREATE INDEX :updateDateIdx
@@ -78,6 +77,7 @@ ALTER TABLE gn_imports.:ooImportTable OWNER TO :gnDbOwner ;
 \echo '-------------------------------------------------------------------------------'
 \echo 'Copy CVS file to import occurrences occtax table'
 COPY gn_imports.:ooImportTable (
+    unique_id_sinp_occtax,
     code_nomenclature_obs_technique,
     code_nomenclature_bio_condition,
     code_nomenclature_bio_status,
