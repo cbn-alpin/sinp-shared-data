@@ -61,7 +61,7 @@ ALTER TABLE gn_imports.:roImportTable
 \echo 'Create indexes on imports releves occtax table'
 \set uniqueIdIdx 'idx_unique_':roImportTable'_unique_id_sinp_grp'
 CREATE UNIQUE INDEX :uniqueIdIdx
-    ON gn_imports.:roImportTable USING btree (unique_id);
+    ON gn_imports.:roImportTable USING btree (unique_id_sinp_grp);
 
 \set updateDateIdx 'idx_':roImportTable'_meta_update_date'
 CREATE INDEX :updateDateIdx
