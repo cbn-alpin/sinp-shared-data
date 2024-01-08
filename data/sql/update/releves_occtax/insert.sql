@@ -57,7 +57,8 @@ BEGIN
             precision,
             additional_fields,
             meta_create_date,
-            meta_update_date
+            meta_update_date,
+            meta_last_action
         )
         SELECT
             unique_id_sinp_grp,
@@ -100,7 +101,7 @@ BEGIN
         LIMIT step ;
 
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
-        RAISE NOTICE 'Inserted PARENT acquistion frameworks rows: %', affectedRows ;
+        RAISE NOTICE 'Inserted PARENT releves occtax rows: %', affectedRows ;
 
         offsetCnt := offsetCnt + (step) ;
     END LOOP ;
