@@ -30,7 +30,7 @@ BEGIN
         RAISE NOTICE 'Try to insert % occtax from %', step, offsetCnt ;
 
         RAISE NOTICE '-------------------------------------------------' ;
-        RAISE NOTICE 'Inserting occtax data to "t_releves_occtax, t_occurrences_occtax, cor_counting_occtax" if not exist' ;
+        RAISE NOTICE 'Inserting occtax data to "t_releves_occtax" if not exist' ;
         INSERT INTO pr_occtax.t_releves_occtax (
             unique_id_sinp_grp,
             id_dataset,
@@ -99,7 +99,11 @@ BEGIN
         -- With NOT EXISTS don't use OFFSET because it's eliminate previously inserted rows.
         -- OFFSET offsetCnt
         LIMIT step ;
+        GET DIAGNOSTICS affectedRows = ROW_COUNT;
+        RAISE NOTICE 'Inserted releves occtax rows: %', affectedRows ;
 
+        RAISE NOTICE '-------------------------------------------------' ;
+        RAISE NOTICE 'Inserting occurrences occtax data to "t_occurences_occtax" if not exist' ;
         INSERT INTO pr_occtax.t_occurrences_occtax (
             unique_id_occurence_occtax,
             id_nomenclature_obs_technique,
@@ -162,8 +166,12 @@ BEGIN
         -- With NOT EXISTS don't use OFFSET because it's eliminate previously inserted rows.
         -- OFFSET offsetCnt
         LIMIT step ;
+        GET DIAGNOSTICS affectedRows = ROW_COUNT;
+        RAISE NOTICE 'Inserted occurrences occtax rows: %', affectedRows ;
 
-         INSERT INTO pr_occtax.cor_counting_occtax (
+        RAISE NOTICE '-------------------------------------------------' ;
+        RAISE NOTICE 'Inserting counting occtax data to "cor_counting_occtax" if not exist' ;
+        INSERT INTO pr_occtax.cor_counting_occtax (
             unique_id_sinp_occtax,
             code_nomenclature_life_stage,
             code_nomenclature_sex,
@@ -199,9 +207,8 @@ BEGIN
         -- With NOT EXISTS don't use OFFSET because it's eliminate previously inserted rows.
         -- OFFSET offsetCnt
         LIMIT step ;
-
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
-        RAISE NOTICE 'Inserted PARENT occtax rows: %', affectedRows ;
+        RAISE NOTICE 'Inserted counting occtax rows: %', affectedRows ;
 
         offsetCnt := offsetCnt + (step) ;
     END LOOP ;
