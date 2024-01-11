@@ -10,12 +10,12 @@ SET client_encoding = 'UTF8';
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Remove imports occtax table if already exists'
-DROP TABLE IF EXISTS gn_imports.:ocImportTable ;
+DROP TABLE IF EXISTS gn_imports.:occtaxImportTable ;
 
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Create imports occtax table from "t_releves_occtax, t_occurrences_occtax, cor_counting_occtax" with additional fields'
-CREATE TABLE gn_imports.:ocImportTable AS
+CREATE TABLE gn_imports.:occtaxImportTable AS
     SELECT
         NULL::INT AS gid,
         unique_id_sinp_grp,
@@ -79,35 +79,35 @@ WITH NO DATA ;
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Add primary key on imports occtax table'
-\set importTablePk 'pk_':ocImportTable
-ALTER TABLE gn_imports.:ocImportTable
+\set importTablePk 'pk_':occtaxImportTable
+ALTER TABLE gn_imports.:occtaxImportTable
 	ALTER COLUMN gid ADD GENERATED ALWAYS AS IDENTITY,
 	ADD CONSTRAINT :importTablePk PRIMARY KEY(gid);
 
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Create indexes on imports occtax table'
-\set uniqueIdIdx 'idx_unique_':ocImportTable'_unique_id_sinp_grp'
+\set uniqueIdIdx 'idx_unique_':occtaxImportTable'_unique_id_sinp_grp'
 CREATE UNIQUE INDEX :uniqueIdIdx
-    ON gn_imports.:ocImportTable USING btree (unique_id_sinp_grp);
+    ON gn_imports.:occtaxImportTable USING btree (unique_id_sinp_grp);
 
-\set updateDateIdx 'idx_':ocImportTable'_meta_update_date'
+\set updateDateIdx 'idx_':occtaxImportTable'_meta_update_date'
 CREATE INDEX :updateDateIdx
-    ON gn_imports.:ocImportTable USING btree (meta_update_date);
+    ON gn_imports.:occtaxImportTable USING btree (meta_update_date);
 
-\set lastActionIdx 'idx_':ocImportTable'_meta_last_action'
+\set lastActionIdx 'idx_':occtaxImportTable'_meta_last_action'
 CREATE INDEX :lastActionIdx
-    ON gn_imports.:ocImportTable USING btree (meta_last_action);
+    ON gn_imports.:occtaxImportTable USING btree (meta_last_action);
 
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Attribute imports occtax to GeoNature DB owner'
-ALTER TABLE gn_imports.:ocImportTable OWNER TO :gnDbOwner ;
+ALTER TABLE gn_imports.:occtaxImportTable OWNER TO :gnDbOwner ;
 
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Copy CVS file to import occtax table'
-COPY gn_imports.:ocImportTable (
+COPY gn_imports.:occtaxImportTable (
     unique_id_sinp_grp,
     code_dataset,
     code_digitiser,

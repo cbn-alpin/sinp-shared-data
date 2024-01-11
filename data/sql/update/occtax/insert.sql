@@ -1,5 +1,5 @@
 BEGIN;
--- This file contain a variable "${ocImportTable}" which must be replaced
+-- This file contain a variable "${occtaxImportTable}" which must be replaced
 -- with "sed" before passing the updated content to psql.
 
 \echo '-------------------------------------------------------------------------------'
@@ -19,7 +19,7 @@ DECLARE
     affectedRows INTEGER;
 BEGIN
     -- Set dynamicly stopAt and step
-    stopAt := gn_imports.computeImportTotal('gn_imports.${ocImportTable}', 'I') ;
+    stopAt := gn_imports.computeImportTotal('gn_imports.${occtaxImportTable}', 'I') ;
     step := gn_imports.computeImportStep(stopAt) ;
     RAISE NOTICE 'Total found: %, step used: %', stopAt, step ;
 
@@ -88,7 +88,7 @@ BEGIN
             meta_create_date,
             meta_update_date,
             meta_last_action
-        FROM gn_imports.${ocImportTable} AS ocit
+        FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM pr_occtax.t_releves_occtax AS tro
@@ -155,7 +155,7 @@ BEGIN
             meta_create_date,
             meta_update_date,
             meta_last_action
-        FROM gn_imports.${ocImportTable} AS ocit
+        FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM pr_occtax.t_occurrences_occtax AS too
@@ -196,7 +196,7 @@ BEGIN
             meta_create_date,
             meta_update_date,
             meta_last_action
-        FROM gn_imports.${ocImportTable} AS ocit
+        FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM pr_occtax.cor_counting_occtax AS cco
