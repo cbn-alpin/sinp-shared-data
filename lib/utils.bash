@@ -414,7 +414,7 @@ trim() {
 # SOURCE: -
 function downloadWeb() {
     if [[ $# -lt 2 ]]; then
-        exitScript 'Missing required argument to download()!' 2
+        exitScript "Missing required argument to ${FUNCNAME[0]}()!" 2
     fi
     local readonly commands=("wget" "grep" "uniq")
     checkBinary "${commands[@]}"
@@ -436,7 +436,7 @@ function downloadWeb() {
 # SOURCE: -
 function downloadSftp() {
     if [[ $# -lt 6 ]]; then
-        exitScript 'Missing required argument to download()!' 6
+        exitScript "Missing required argument to ${FUNCNAME[0]}()!" 6
     fi
     local readonly commands=("sshpass" "sftp")
     checkBinary "${commands[@]}"
@@ -516,4 +516,37 @@ function extract() {
     else
         printError "'$1' is not a valid file!"
     fi
+}
+
+
+# DESC: send a message to Telgram group.
+#       Variables telegram_group_id and telegram_bot_token
+#       must be set in a settings.ini file.
+#       Use telegram_url variable optionally.
+# ARGS: $1 (required): message to send.
+# OUTS: None
+# SOURCE: https://bogomolov.tech/Telegram-notification-on-SSH-login/
+function sendTelegram() {
+    if [[ -z "${telegram_bot_token}" ]] || [[ -z "${telegram_group_id}" ]]; then
+        exitScript "Please define TELEGRAM_BOT_TOKEN and TELEGRAM_GROUP_ID (TELEGRAM_URL optionally) before used of this function."
+    fi
+
+    if [[ -z "${TELEGRAM_URL}" ]]; then
+        telegram_url="https://api.telegram.org/bot${telegram_bot_token}/sendMessage"
+    fi
+
+    if [[ "$1" == "-h" ]]; then
+        exitScript "Usage: ${FUNCNAME[0]} \"text message\""
+    fi
+
+    if [[ -z "$1" ]]; then
+        exitScript "Missing required argument (message text) to ${FUNCNAME[0]}()!"
+    fi
+
+    if [[ "$#" -ne 1 ]]; then
+        exitScript "You can pass only one argument to ${FUNCNAME[0]}(). For string with spaces put it on quotes."
+    fi
+
+    # Send message
+    curl -s --data "text=$1" --data "chat_id=${telegram_group_id}" "${telegram_url}" > /dev/null
 }
