@@ -230,7 +230,7 @@ function loadScriptConfig() {
     loadSharedDefaultConfig
     loadSharedUserConfig
     loadModuleDefaultConfig
-    loadModuleUserConfig "${1}"
+    loadModuleUserConfig "${1:-}"
 }
 
 
@@ -527,11 +527,11 @@ function extract() {
 # OUTS: None
 # SOURCE: https://bogomolov.tech/Telegram-notification-on-SSH-login/
 function sendTelegram() {
-    if [[ -z "${telegram_bot_token}" ]] || [[ -z "${telegram_group_id}" ]]; then
+    if [[ -z "${telegram_bot_token-}" ]] || [[ -z "${telegram_group_id-}" ]]; then
         exitScript "Please define TELEGRAM_BOT_TOKEN and TELEGRAM_GROUP_ID (TELEGRAM_URL optionally) before used of this function."
     fi
 
-    if [[ -z "${TELEGRAM_URL}" ]]; then
+    if [[ -z "${telegram_url-}" ]]; then
         telegram_url="https://api.telegram.org/bot${telegram_bot_token}/sendMessage"
     fi
 
@@ -548,5 +548,9 @@ function sendTelegram() {
     fi
 
     # Send message
-    curl -s --data "text=$1" --data "chat_id=${telegram_group_id}" "${telegram_url}" > /dev/null
+    if [[ -z "${telegram_verbose-}" ]]; then
+        curl --silent --show-error --data "text=$1" --data "chat_id=${telegram_group_id}" "${telegram_url}" > /dev/null
+    else
+        curl --silent --show-error --data "text=$1" --data "chat_id=${telegram_group_id}" "${telegram_url}"
+    fi
 }
