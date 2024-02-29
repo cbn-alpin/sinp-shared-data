@@ -554,3 +554,37 @@ function sendTelegram() {
         curl --silent --show-error --data "text=$1" --data "chat_id=${telegram_group_id}" "${telegram_url}"
     fi
 }
+
+# DESC: Ask to execute next step (=function), jump or cancel script (=exit).
+# ARGS: $1 (required): function containing next step.
+# OUTS: None
+# SOURCE:
+function stepToNext() {
+    if [[ $# -lt 1 ]]; then
+        exitScript "Missing required argument to ${FUNCNAME[0]}()!" 2
+    fi
+
+    function_name="${1-}"
+    step=${step:=0}
+    step=$((step + 1))
+
+    if [[ "${step}" = "1" ]]; then
+        printPretty "${Blink}HELP:${RCol} ${Mag}y=yes, j=jump (not execute next function), c=cancel script (exit)" ${Mag}
+    fi
+
+    echo # Move to a new line
+    printPretty "Step #${step} (⌚ $(date +'%H:%M'))- Go to next step '${function_name}' (y/j/c) ?" ${Mag}
+    read -r -n 1 key
+    echo # Move to a new line
+    if [[ ! "${key}" =~ ^[YyjJ]$ ]];then
+        printPretty "Are you sure to exit script (y/n) ?" ${Red}
+        read -r -n 1 key
+        echo # Move to a new line
+        if [[ "${key}" =~ ^[Yy]$ ]];then
+            [[ "${0}" = "${BASH_SOURCE}" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+        fi
+    fi
+    if [[ ! "${key}" =~ ^[Jj]$ ]];then
+        "$@"
+    fi
+}
