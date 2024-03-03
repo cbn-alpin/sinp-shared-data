@@ -36,16 +36,17 @@ function initScript() {
 
     # Useful paths
     readonly orig_cwd="$PWD"
-    readonly script_path="${BASH_SOURCE[1]}"
+    readonly script_path=$(realpath "${BASH_SOURCE[1]}")
     readonly script_dir="$(cd "$(dirname "${script_path}")" && pwd -P)"
     readonly script_name="$(basename "$script_path")"
     readonly script_params="$*"
 
     #+----------------------------------------------------------------------------+
     # Directories pathes
-    readonly lib_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+    readonly current_lib_path="$(realpath "${BASH_SOURCE[0]}")"
+    readonly lib_shared_dir=$(realpath "${current_lib_path%/*}/../")
     readonly bin_dir="${script_dir}"
-    readonly root_dir="$(realpath ${lib_dir}/../../)"
+    readonly root_dir="$(realpath ${lib_shared_dir}/../)"
     readonly module_dir="$(realpath ${script_dir}/../)"
     readonly shared_dir="${root_dir}/shared"
     readonly data_shared_dir="${shared_dir}/data"
@@ -56,6 +57,7 @@ function initScript() {
     readonly data_dir="${module_dir}/data"
     readonly raw_dir="${data_dir}/raw"
     readonly sql_dir="${data_dir}/sql"
+    readonly lib_dir="${module_dir}/lib"
     readonly var_dir="${module_dir}/var"
     readonly log_dir="${var_dir}/log"
     readonly tmp_dir="${var_dir}/tmp"
@@ -163,7 +165,11 @@ function printError() {
 # SOURCE: https://github.com/ralish/bash-script-template/blob/stable/source.sh
 function printVerbose() {
     if [[ -n ${verbose-} ]]; then
-        printPretty "${@}"
+        if [[ $# -eq 1 ]]; then
+            printPretty "${1}" ${Gra}
+        else
+            printPretty "${@}"
+        fi
     fi
 }
 
@@ -587,4 +593,13 @@ function stepToNext() {
     if [[ ! "${key}" =~ ^[Jj]$ ]];then
         "$@"
     fi
+}
+
+# DESC: Return true if first argument semantic version string is greater than second.
+# ARGS: $1 (required): first version string
+# ARGS: $2 (required): second version string
+# OUTS: None
+# SOURCE:
+function isVersionGreaterThan() {
+	test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
 }
