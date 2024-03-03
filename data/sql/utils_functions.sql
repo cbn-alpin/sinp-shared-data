@@ -256,6 +256,85 @@ $function$
 $function$ ;
 
 
+\echo '----------------------------------------------------------------------------'
+\echo 'Set function "get_id_module_by_code()"'
+CREATE OR REPLACE FUNCTION gn_commons.get_id_module_by_code(moduleCode character varying)
+    RETURNS int
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the id_module from a module code
+    DECLARE idModule INTEGER;
+
+    BEGIN
+        SELECT id_module INTO idModule
+        FROM gn_commons.t_modules
+        WHERE module_code ILIKE moduleCode ;
+
+        RETURN idModule ;
+    END ;
+$function$ ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Set function "get_id_action_by_code()"'
+CREATE OR REPLACE FUNCTION gn_permissions.get_id_action_by_code(actionCode character varying)
+    RETURNS int
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the id_action from an action code
+    DECLARE idAction INTEGER;
+
+    BEGIN
+        SELECT id_action INTO idAction
+        FROM gn_permissions.bib_actions
+        WHERE code_action ILIKE actionCode ;
+
+        RETURN idAction ;
+    END ;
+$function$ ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Set function "get_id_object_by_code()"'
+CREATE OR REPLACE FUNCTION gn_permissions.get_id_object_by_code(objectCode character varying)
+    RETURNS int
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the id_object from an object code
+    DECLARE idObject INTEGER;
+
+    BEGIN
+        SELECT id_object INTO idObject
+        FROM gn_permissions.t_objects
+        WHERE code_object ILIKE objectCode ;
+
+        RETURN idObject ;
+    END ;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "reset_sequence()"'
+CREATE OR REPLACE FUNCTION public.reset_sequence(table_schema text, tablename text, columnname text, sequence_name text)
+    RETURNS "pg_catalog"."void"
+    LANGUAGE plpgsql
+AS
+$function$
+      DECLARE
+      BEGIN
+        EXECUTE 'LOCK TABLE ' || table_schema || '.'|| tablename || ' IN EXCLUSIVE MODE ;' ;
+        EXECUTE 'SELECT setval( ''' || sequence_name  || ''', ' || '(SELECT MAX(' || columnname ||
+            ') FROM ' || table_schema || '.'|| tablename || ')' || '+1)' ;
+      END ;
+$function$ ;
+
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "computeImportTotal()"'
 CREATE OR REPLACE FUNCTION gn_imports.computeImportTotal(
