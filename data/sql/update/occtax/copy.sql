@@ -7,6 +7,21 @@ BEGIN;
 
 SET client_encoding = 'UTF8';
 
+\echo '----------------------------------------------------------------------------'
+\echo 'Verify if "pr_occtax" schema exists'
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.schemata
+        WHERE schema_name = 'pr_occtax'
+    ) THEN
+        RAISE EXCEPTION 'Schema "pr_occtax" not found.'
+            USING HINT = 'Please install Occtax module.';
+    END IF;
+END
+$$;
+
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Remove imports occtax table if already exists'
@@ -22,7 +37,8 @@ CREATE TABLE gn_imports.:occtaxImportTable AS
         id_dataset AS code_dataset,
         id_digitiser AS code_digitiser,
         observers_txt AS observers,
-        id_nomenclature_grp_typ AS code_nomenclature_grp_typ,
+        id_nomenclature_tech_collect_campanule AS code_nomenclature_tech_collect_campanule,
+        id_nomenclature_grp_typ::varchar AS code_nomenclature_grp_typ,
         grp_method,
         date_min,
         date_max,
@@ -110,7 +126,7 @@ ALTER TABLE gn_imports.:occtaxImportTable OWNER TO :gnDbOwner ;
 
 
 \echo '-------------------------------------------------------------------------------'
-\echo 'Copy CVS file to import occtax table'
+\echo 'Copy CSV file to import occtax table'
 COPY gn_imports.:occtaxImportTable (
     unique_id_sinp_grp,
     code_dataset,
@@ -150,7 +166,6 @@ COPY gn_imports.:occtaxImportTable (
     digital_proof,
     non_digital_proof,
     comment_description,
-    unique_id_sinp_occtax,
     code_nomenclature_life_stage,
     code_nomenclature_sex,
     code_nomenclature_obj_count,

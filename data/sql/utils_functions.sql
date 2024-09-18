@@ -474,6 +474,50 @@ END;
 $function$
 ;
 
+\echo '----------------------------------------------------------------------------'
+\echo 'Create function to get id_releve_occtax from unique_id_sinp_grp'
+
+CREATE OR REPLACE FUNCTION pr_occtax.get_id_survey_by_uuid(uuidGrp uuid)
+ RETURNS integer
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+    -- Function which return the id_releve from an unique_id_sinp_grp
+    DECLARE idReleve integer;
+
+    BEGIN
+        SELECT INTO idReleve id_releve_occtax
+        FROM pr_occtax.t_releves_occtax AS tr
+        WHERE tr.unique_id_sinp_grp = my_unique_id_sinp_grp ;
+
+        RETURN idReleve ;
+
+    END;
+$function$
+;
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Create function to get id_occurence_occtax from unique_id_occurence_occtax'
+
+CREATE OR REPLACE FUNCTION pr_occtax.get_id_occurrence_by_uuid(uuidOccurrence uuid)
+ RETURNS integer
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+    -- Function which return the id_occurence from an unique_id_occurence_occtax
+    DECLARE idOccurence integer;
+
+    BEGIN
+        SELECT INTO idOccurence id_occurrence_occtax
+        FROM pr_occtax.t_occurrences_occtax AS toc
+        WHERE toc.unique_id_occurence_occtax = uuidOccurrence ;
+
+        RETURN idOccurence ;
+
+    END;
+$function$
+;
+
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
