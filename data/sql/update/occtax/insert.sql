@@ -41,8 +41,6 @@ BEGIN
             grp_method,
             date_min,
             date_max,
-            hour_min,
-            hour_max,
             cd_hab,
             altitude_min,
             altitude_max,
@@ -55,23 +53,18 @@ BEGIN
             geom_4326,
             id_nomenclature_geo_object_nature,
             precision,
-            additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
-        )
+            additional_fields
+            )
         SELECT
             unique_id_sinp_grp,
             code_dataset,
             code_digitiser,
             observers,
             code_nomenclature_tech_collect_campanule,
-            code_nomenclature_grp_typ,
+            code_nomenclature_grp_typ::int,
             grp_method,
             date_min,
             date_max,
-            hour_min,
-            hour_max,
             cd_hab,
             altitude_min,
             altitude_max,
@@ -80,14 +73,11 @@ BEGIN
             place_name,
             meta_device_entry,
             comment_context,
-            ST_Transform(geom, 4326),
             geom,
+            ST_Transform(geom, 4326),
             code_nomenclature_geo_object_nature,
             precision,
-            additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            additional_fields
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
@@ -125,11 +115,8 @@ BEGIN
             digital_proof,
             non_digital_proof,
             comment,
-            additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
-        )
+            additional_fields
+            )
         SELECT
             unique_id_occurence_occtax,
             code_nomenclature_obs_technique,
@@ -151,10 +138,7 @@ BEGIN
             digital_proof,
             non_digital_proof,
             comment_description,
-            additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            additional_fields
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
@@ -179,11 +163,8 @@ BEGIN
             code_nomenclature_type_count,
             count_min,
             count_max,
-            additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
-        )
+            additional_fields
+            )
         SELECT
             unique_id_sinp_occtax,
             code_nomenclature_life_stage,
@@ -193,8 +174,6 @@ BEGIN
             count_min,
             count_max,
             additional_fields,
-            meta_create_date,
-            meta_update_date,
             meta_last_action
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
