@@ -53,7 +53,8 @@ BEGIN
             geom_4326,
             id_nomenclature_geo_object_nature,
             precision,
-            additional_fields
+            additional_fields,
+            id_module
             )
         SELECT
             unique_id_sinp_grp,
@@ -77,7 +78,8 @@ BEGIN
             ST_Transform(geom, 4326),
             code_nomenclature_geo_object_nature,
             precision,
-            additional_fields
+            additional_fields,
+            code_module
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
@@ -110,7 +112,7 @@ BEGIN
             id_nomenclature_determination_method,
             cd_nom,
             nom_cite,
-            meta_v_taref,
+            meta_v_taxref,
             sample_number_proof,
             digital_proof,
             non_digital_proof,
