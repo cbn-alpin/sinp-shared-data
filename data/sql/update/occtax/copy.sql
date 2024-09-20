@@ -80,6 +80,7 @@ CREATE TABLE gn_imports.:occtaxImportTable AS
         count_min,
         count_max,
         tro.additional_fields,
+        tro.id_module AS code_module,
         NULL::TIMESTAMP AS meta_create_date,
         NULL::TIMESTAMP AS meta_update_date,
         NULL::BPCHAR(1) AS meta_last_action
@@ -147,6 +148,7 @@ COPY gn_imports.:occtaxImportTable (
     geom,
     code_nomenclature_geo_object_nature,
     precision,
+    code_releve_occtax,
     unique_id_occurence_occtax,
     code_nomenclature_obs_technique,
     code_nomenclature_bio_condition,
@@ -173,6 +175,7 @@ COPY gn_imports.:occtaxImportTable (
     count_min,
     count_max,
     additional_fields,
+    code_module,
     meta_create_date,
     meta_update_date,
     meta_last_action
