@@ -116,8 +116,7 @@ BEGIN
             sample_number_proof,
             digital_proof,
             non_digital_proof,
-            comment,
-            additional_fields
+            comment
             )
         SELECT
             unique_id_occurence_occtax,
@@ -139,8 +138,7 @@ BEGIN
             sample_number_proof,
             digital_proof,
             non_digital_proof,
-            comment_description,
-            additional_fields
+            comment_description
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
@@ -159,13 +157,12 @@ BEGIN
         RAISE NOTICE 'Inserting counting occtax data to "cor_counting_occtax" if not exist' ;
         INSERT INTO pr_occtax.cor_counting_occtax (
             unique_id_sinp_occtax,
-            code_nomenclature_life_stage,
-            code_nomenclature_sex,
-            code_nomenclature_obj_count,
-            code_nomenclature_type_count,
+            id_nomenclature_life_stage,
+            id_nomenclature_sex,
+            id_nomenclature_obj_count,
+            id_nomenclature_type_count,
             count_min,
-            count_max,
-            additional_fields
+            count_max
             )
         SELECT
             unique_id_sinp_occtax,
@@ -174,9 +171,7 @@ BEGIN
             code_nomenclature_obj_count,
             code_nomenclature_type_count,
             count_min,
-            count_max,
-            additional_fields,
-            meta_last_action
+            count_max
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
