@@ -108,6 +108,7 @@ BEGIN
         INSERT INTO pr_occtax.t_occurrences_occtax (
             unique_id_occurence_occtax,
             id_releve_occtax,
+            id_releve_occtax,
             id_nomenclature_obs_technique,
             id_nomenclature_bio_condition,
             id_nomenclature_bio_status,
