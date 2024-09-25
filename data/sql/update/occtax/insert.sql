@@ -150,8 +150,7 @@ BEGIN
             sample_number_proof,
             digital_proof,
             non_digital_proof,
-            comment_description,
-            additional_fields
+            comment_description
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
@@ -187,9 +186,7 @@ BEGIN
             code_nomenclature_obj_count,
             code_nomenclature_type_count,
             count_min,
-            count_max,
-            additional_fields,
-            meta_last_action
+            count_max
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
