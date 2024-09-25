@@ -98,6 +98,7 @@ BEGIN
         RAISE NOTICE 'Inserting occurrences occtax data to "t_occurences_occtax" if not exist' ;
         INSERT INTO pr_occtax.t_occurrences_occtax (
             unique_id_occurence_occtax,
+            id_releve_occtax,
             id_nomenclature_obs_technique,
             id_nomenclature_bio_condition,
             id_nomenclature_bio_status,
@@ -120,6 +121,7 @@ BEGIN
             )
         SELECT
             unique_id_occurence_occtax,
+            pr_occtax.get_id_releve_from_unique_id_sinp_grp(unique_id_sinp_grp),
             code_nomenclature_obs_technique,
             code_nomenclature_bio_condition,
             code_nomenclature_bio_status,
@@ -157,6 +159,7 @@ BEGIN
         RAISE NOTICE 'Inserting counting occtax data to "cor_counting_occtax" if not exist' ;
         INSERT INTO pr_occtax.cor_counting_occtax (
             unique_id_sinp_occtax,
+            id_occurrence_occtax,
             id_nomenclature_life_stage,
             id_nomenclature_sex,
             id_nomenclature_obj_count,
@@ -166,6 +169,7 @@ BEGIN
             )
         SELECT
             unique_id_sinp_occtax,
+            pr_occtax.get_id_occurence_from_unique_id_occurence_occtax(unique_id_occurence_occtax),
             code_nomenclature_life_stage,
             code_nomenclature_sex,
             code_nomenclature_obj_count,
