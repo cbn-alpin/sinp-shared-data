@@ -9,6 +9,21 @@ BEGIN;
 
 SET client_encoding = 'UTF8';
 
+\echo '----------------------------------------------------------------------------'
+\echo 'Verify if "pr_occtax" schema exists'
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.schemata
+        WHERE schema_name = 'pr_occtax'
+    ) THEN
+        RAISE EXCEPTION 'Schema "pr_occtax" not found.'
+            USING HINT = 'Please install Occtax module.';
+    END IF;
+END
+$$;
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Batch updating in "t_releves_occtax, t_occurrences_occtax, cor_counting_occtax" of the imported occtax'
 DO $$
