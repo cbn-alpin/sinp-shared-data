@@ -125,6 +125,20 @@ CREATE INDEX :lastActionIdx
 \echo 'Attribute imports occtax to GeoNature DB owner'
 ALTER TABLE gn_imports.:occtaxImportTable OWNER TO :gnDbOwner ;
 
+\echo '----------------------------------------------------------------------------'
+\echo 'Verify if "pr_occtax" schema exists'
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.schemata
+        WHERE schema_name = 'pr_occtax'
+    ) THEN
+        RAISE EXCEPTION 'Schema "pr_occtax" not found.'
+            USING HINT = 'Please install Occtax module.';
+    END IF;
+END
+$$;
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Copy CSV file to import occtax table'

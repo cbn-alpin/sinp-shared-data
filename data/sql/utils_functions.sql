@@ -475,6 +475,21 @@ $function$
 ;
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Verify if "pr_occtax" schema exists'
+DO $$
+    BEGIN
+        IF EXISTS (
+            SELECT 1
+            FROM information_schema.schemata
+            WHERE schema_name = 'pr_occtax'
+        ) IS FALSE THEN
+            RAISE EXCEPTION 'Schema "pr_occtax" not found.' ;
+                USING HINT = 'Please install Occtax module.'
+        END IF ;
+    END
+$$ ;
+
+\echo '----------------------------------------------------------------------------'
 \echo 'Create function to get id_releve_occtax from unique_id_sinp_grp'
 
 CREATE OR REPLACE FUNCTION pr_occtax.get_id_survey_by_uuid(uuidGrp uuid)
