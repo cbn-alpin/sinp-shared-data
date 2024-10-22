@@ -235,6 +235,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_meshes AS (
     FROM gn_synthese.synthese_geom_m1 AS sgm
         LEFT JOIN ref_geo.flatten_meshes AS fm
             ON sgm.id_m1 = fm.id_m1
+    WHERE fm.id_m2 IS NOT NULL
 
     UNION
 
@@ -244,6 +245,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_meshes AS (
     FROM gn_synthese.synthese_geom_m1 AS sgm
         LEFT JOIN ref_geo.flatten_meshes AS fm
             ON sgm.id_m1 = fm.id_m1
+    WHERE fm.id_m5 IS NOT NULL
 
     UNION
 
@@ -253,6 +255,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_meshes AS (
     FROM gn_synthese.synthese_geom_m1 AS sgm
         LEFT JOIN ref_geo.flatten_meshes AS fm
             ON sgm.id_m1 = fm.id_m1
+    WHERE fm.id_m10 IS NOT NULL
 
     UNION
 
@@ -262,6 +265,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_meshes AS (
     FROM gn_synthese.synthese_geom_m1 AS sgm
         LEFT JOIN ref_geo.flatten_meshes AS fm
             ON sgm.id_m1 = fm.id_m1
+    WHERE fm.id_m20 IS NOT NULL
 
     UNION
 
@@ -271,6 +275,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_meshes AS (
     FROM gn_synthese.synthese_geom_m1 AS sgm
         LEFT JOIN ref_geo.flatten_meshes AS fm
             ON sgm.id_m1 = fm.id_m1
+    WHERE fm.id_m50 IS NOT NULL
 ) ;
 
 \echo ' Create index on column id_mesh for synthese_geom_meshes table'
