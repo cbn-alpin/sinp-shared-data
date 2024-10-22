@@ -16,6 +16,9 @@ BEGIN;
 \echo '----------------------------------------------------------------------------'
 \echo 'Create subdivided REG, DEP and COM areas temporary table'
 
+\echo 'Drop subdivided REG, DEP and COM areas table'
+DROP TABLE IF EXISTS ref_geo.subdivided_areas ;
+
 \echo ' Add subdivided REG, DEP and COM areas table'
 -- SINP AURA Preprod: 31 735 rows in 29s 352ms
 CREATE TABLE IF NOT EXISTS ref_geo.subdivided_areas AS
@@ -41,6 +44,9 @@ ON ref_geo.subdivided_areas USING btree(area_id) ;
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Drop geom_synthese table'
+DROP TABLE IF EXISTS gn_synthese.geom_synthese ;
+
 \echo ' Create geom_synthese temporary table with observations ids group by geom'
 -- SINP AURA Preprod (29 million obs): 7 213 407 rows in 03mn 12s 407ms
 CREATE TABLE IF NOT EXISTS gn_synthese.geom_synthese AS (
@@ -58,6 +64,9 @@ ON gn_synthese.geom_synthese USING gist(the_geom_local);
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Drop flatten_meshes table'
+DROP TABLE IF EXISTS ref_geo.flatten_meshes ;
+
 \echo ' Create flatten_meshes temporary table with meshes M1, M2, M5, M10, M20, M50'
 -- SINP AURA Preprod: 72 230 rows in 1mn 45s 846ms
 CREATE TABLE IF NOT EXISTS ref_geo.flatten_meshes AS (
@@ -111,6 +120,9 @@ ON ref_geo.flatten_meshes USING btree(id_m1);
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Drop synthese_geom_dep table'
+DROP TABLE IF EXISTS gn_synthese.synthese_geom_dep ;
+
 \echo 'Create synthese_geom_dep temporary table'
 CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_dep AS (
     SELECT DISTINCT
@@ -133,6 +145,9 @@ ON gn_synthese.synthese_geom_dep USING btree(area_code) ;
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Drop area_syntheses table'
+DROP TABLE IF EXISTS gn_synthese.area_syntheses ;
+
 \echo 'Create area_syntheses temporary table'
 CREATE TABLE IF NOT EXISTS gn_synthese.area_syntheses AS (
     SELECT DISTINCT
@@ -169,6 +184,9 @@ ON gn_synthese.area_syntheses USING btree(area_id) ;
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Drop synthese_geom_m1 table'
+DROP TABLE IF EXISTS gn_synthese.synthese_geom_m1 ;
+
 \echo 'Create synthese_geom_m1 temporary table'
 -- SINP AURA Preprod: 7 483 988 rows in 1mn 42s
 CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_m1 AS (
@@ -190,6 +208,9 @@ ON gn_synthese.synthese_geom_m1 USING btree(id_m1) ;
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Drop synthese_geom_meshes table'
+DROP TABLE IF EXISTS gn_synthese.synthese_geom_meshes ;
+
 \echo 'Create synthese_geom_meshes temporary table'
 -- SINP AURA Preprod: 43 677 186 rows in 7mn 21s
 CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_meshes AS (
@@ -256,6 +277,9 @@ ON gn_synthese.synthese_geom_meshes USING btree(id_mesh) ;
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Drop synthese_sinp table'
+DROP TABLE IF EXISTS gn_synthese.synthese_sinp ;
+
 \echo 'Create synthese_sinp temporary table'
 -- SINP AURA Preprod: 29 175 104 rows in 56s
 CREATE TABLE IF NOT EXISTS gn_synthese.synthese_sinp AS (
@@ -506,6 +530,34 @@ ON DELETE CASCADE ON UPDATE CASCADE ;
 -- 8mn 11s
 CREATE INDEX cor_area_synthese_id_synthese_idx
 ON gn_synthese.cor_area_synthese USING btree(id_synthese);
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Clean all temporary tables'
+
+\echo ' Drop subdivided REG, DEP and COM areas table'
+DROP TABLE IF EXISTS ref_geo.subdivided_areas ;
+
+\echo ' Drop geom_synthese table'
+DROP TABLE IF EXISTS gn_synthese.geom_synthese ;
+
+\echo ' Drop flatten_meshes table'
+DROP TABLE IF EXISTS ref_geo.flatten_meshes ;
+
+\echo ' Drop synthese_geom_dep table'
+DROP TABLE IF EXISTS gn_synthese.synthese_geom_dep ;
+
+\echo ' Drop area_syntheses table'
+DROP TABLE IF EXISTS gn_synthese.area_syntheses ;
+
+\echo ' Drop synthese_geom_m1 table'
+DROP TABLE IF EXISTS gn_synthese.synthese_geom_m1 ;
+
+\echo ' Drop synthese_geom_meshes table'
+DROP TABLE IF EXISTS gn_synthese.synthese_geom_meshes ;
+
+\echo ' Drop synthese_sinp table'
+DROP TABLE IF EXISTS gn_synthese.synthese_sinp ;
 
 
 \echo '----------------------------------------------------------------------------'
