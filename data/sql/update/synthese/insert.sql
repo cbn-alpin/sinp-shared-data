@@ -213,9 +213,9 @@ ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_insert_calculate_sensitivity
 \echo 'Disable foreigns keys and triggers on gn_synthese.cor_observer_synthese'
 ALTER TABLE gn_synthese.cor_observer_synthese DISABLE TRIGGER trg_maj_synthese_observers_txt;
 
-ALTER TABLE gn_synthese.cor_observer_synthese DROP CONSTRAINT fk_gn_synthese_id_role ;
+ALTER TABLE gn_synthese.cor_observer_synthese DROP CONSTRAINT IF EXISTS fk_gn_synthese_id_role ;
 
-ALTER TABLE gn_synthese.cor_observer_synthese DROP CONSTRAINT fk_gn_synthese_id_synthese ;
+ALTER TABLE gn_synthese.cor_observer_synthese DROP CONSTRAINT IF EXISTS fk_gn_synthese_id_synthese ;
 
 
 \echo '-------------------------------------------------------------------------------'
