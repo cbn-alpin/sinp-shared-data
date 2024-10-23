@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.synthese_geom_dep AS (
         a.area_id,
         a.area_code
     FROM gn_synthese.geom_synthese AS s
-        INNER JOIN ref_geo.subdivided_areas AS a
+        JOIN ref_geo.subdivided_areas AS a
             ON ( a.code_type = 'DEP' AND st_intersects(s.the_geom_local, a.geom) )
 ) ;
 
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.area_syntheses AS (
         s.id_syntheses,
         a.area_id
     FROM gn_synthese.synthese_geom_dep AS s
-        LEFT JOIN ref_geo.subdivided_areas AS a
+        JOIN ref_geo.subdivided_areas AS a
             ON ( a.code_type = 'COM' AND LEFT(a.area_code, 2) = s.area_code )
     WHERE st_intersects(s.geom, a.geom)
 
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.area_syntheses AS (
         s.id_syntheses,
         a.id_area AS area_id
     FROM gn_synthese.synthese_geom_dep AS s
-        LEFT JOIN (
+        JOIN (
             SELECT id_area
             FROM ref_geo.l_areas
             WHERE id_type = ref_geo.get_id_area_type('REG')
