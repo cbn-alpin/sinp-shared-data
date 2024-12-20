@@ -406,6 +406,74 @@ $function$
     END;
 $function$ ;
 
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "public.fct_trg_meta_dates_change()"'
+CREATE OR REPLACE FUNCTION public.fct_trg_meta_dates_change()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+-- Modify function to keep origin date when exists.
+BEGIN
+        IF(TG_OP = 'INSERT') THEN
+                -- Test if NEW.meta_create_date is null or empty
+                if (NEW.meta_create_date IS NULL) THEN
+                        NEW.meta_create_date = NOW();
+                END IF;
+        ELSIF(TG_OP = 'UPDATE') THEN
+                -- Test if NEW.meta_create_date is null or empty
+                if (NEW.meta_create_date IS NULL) THEN
+                    NEW.meta_update_date = NOW();
+                END IF;
+
+                -- Test if NEW.meta_update_date is null or empty
+                if (NEW.meta_update_date IS NULL) THEN
+                        NEW.meta_create_date = NOW();
+                END IF;
+        END IF;
+        return NEW;
+END;
+$function$
+;
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "utilisateurs.modify_date_insert()"'
+-- Modify function to keep origin date when exists.
+CREATE OR REPLACE FUNCTION utilisateurs.modify_date_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+-- Modify function to keep origin date when exists.
+BEGIN
+    -- Test if NEW.date_insert is null or empty
+    IF (NEW.date_insert IS NULL) THEN
+        NEW.date_insert := NOW();
+    END IF;
+    -- Test if NEW.date_update is null or empty
+    IF (NEW.date_update IS NULL) THEN
+        NEW.date_update := NOW();
+    END IF;
+    RETURN NEW;
+END;
+$function$
+;
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "utilisateurs.modify_date_update()"'
+CREATE OR REPLACE FUNCTION utilisateurs.modify_date_update()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+-- Modify function to keep origin date when exists.
+BEGIN
+    -- Test if NEW.date_update is null or empty
+    IF (NEW.date_update IS NULL) THEN
+        NEW.date_update := NOW();
+    END IF;
+    RETURN NEW;
+END;
+$function$
+;
+
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'

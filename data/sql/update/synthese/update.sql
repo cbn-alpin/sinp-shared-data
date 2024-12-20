@@ -11,11 +11,6 @@ SET client_encoding = 'UTF8';
 
 
 \echo '-------------------------------------------------------------------------------'
-\echo 'Disable trigger "tri_meta_dates_change_synthese"'
-ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_meta_dates_change_synthese ;
-
-
-\echo '-------------------------------------------------------------------------------'
 \echo 'Disable trigger "tri_update_calculate_sensitivity"'
 ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_update_calculate_sensitivity ;
 
@@ -192,11 +187,6 @@ $$ ;
 \echo '-------------------------------------------------------------------------------'
 \echo 'Enable trigger "tri_update_cor_area_synthese"'
 ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_update_cor_area_synthese ;
-
-
-\echo '-------------------------------------------------------------------------------'
-\echo 'Enable trigger "tri_meta_dates_change_synthese"'
-ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_meta_dates_change_synthese ;
 
 
 \echo '-------------------------------------------------------------------------------'
