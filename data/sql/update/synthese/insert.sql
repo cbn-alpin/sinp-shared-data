@@ -150,7 +150,7 @@ BEGIN
             place_name,
             ST_Transform(geom, 4326),
             ST_Transform(ST_Centroid(geom), 4326),
-            geom,
+            ST_Transform(geom, 2154),
             precision,
             id_area_attachment,
             date_min,

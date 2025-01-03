@@ -61,7 +61,7 @@ CREATE TABLE gn_imports.:syntheseImportTable AS
         depth_min,
         depth_max,
         place_name,
-        the_geom_local AS geom,
+        the_geom_local::GEOMETRY AS geom,
         precision,
         id_area_attachment,
         date_min,
