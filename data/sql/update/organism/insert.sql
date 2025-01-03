@@ -41,7 +41,8 @@ BEGIN
             fax_organisme,
             email_organisme,
             url_organisme,
-            url_logo
+            url_logo,
+            additional_data
         )
         SELECT
             oit.unique_id,
@@ -53,7 +54,8 @@ BEGIN
             oit.fax,
             oit.email,
             oit.organism_url,
-            oit.logo_url
+            oit.logo_url,
+            oit.additional_data
         FROM gn_imports.${organismImportTable} AS oit
         WHERE oit.meta_last_action = 'I'
             AND NOT EXISTS (
