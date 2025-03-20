@@ -7,6 +7,10 @@
 -- Use this script this way: psql -h localhost -U geonatadmin -d geonature2db \
 --      -f ~/data/shared/data/sql/refresh_materialized_view.sql.sql
 --
+
+-- Enable timing
+\timing
+
 -- WARNING : this script is not used for now in imports bash script !
 BEGIN;
 
