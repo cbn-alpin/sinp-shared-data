@@ -136,7 +136,7 @@ function printMsg() {
     if [[ $# -lt 1 ]]; then
         exitScript "Missing required argument to ${FUNCNAME[0]}()!" 2
     fi
-    printPretty "--> ${1}" ${Yel}
+    printPretty "⮕ ${1}" ${Yel}
 }
 
 # DESC: Print infos message
@@ -146,7 +146,7 @@ function printInfo() {
     if [[ $# -lt 1 ]]; then
         exitScript "Missing required argument to ${FUNCNAME[0]}()!" 2
     fi
-    printPretty "--> ${1}" ${Whi}
+    printPretty "⮕ ${1}" ${Whi}
 }
 
 # DESC: Print an error message
@@ -156,7 +156,7 @@ function printError() {
     if [[ $# -lt 1 ]]; then
         exitScript "Missing required argument to ${FUNCNAME[0]}()!" 2
     fi
-    printPretty "--> ${1}" ${Red}
+    printPretty "⮕ ${1}" ${Red}
 }
 
 # DESC: Only printPretty() the provided string if verbose mode is enabled
@@ -242,8 +242,8 @@ function loadScriptConfig() {
 
 # DESC: Redirect output
 #       Send stdout and stderr in Terminal and a log file
-#       In Terminal replace "--> " by empty string
-#       In logfile replace "--> " by a separator line and remove color characters.
+#       In Terminal replace "⮕ " by empty string
+#       In logfile replace "⮕ " by a separator line and remove color characters.
 # ARGS: $1 (required): Log file path.
 # OUTS: None
 # NOTE: Directories on log file path will be create if not exist.
@@ -263,7 +263,7 @@ redirectOutput() {
         mkdir -p "${log_file_dir}"
     fi
 
-    exec 3>&1 4>&2 1>&>(sed -r "s/--> //g") 1>&2>&>(tee -a >(grep -v $'\r' | sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g' | sed -r "s/--> /${sep}/g" > "$1"))
+    exec 3>&1 4>&2 1>&>(sed -r "s/⮕ //g") 1>&2>&>(tee -a >(grep -v $'\r' | sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g' | sed -r "s/⮕ /${sep}/g" > "$1"))
 }
 
 # DESC: Check a binary exists in the search path
