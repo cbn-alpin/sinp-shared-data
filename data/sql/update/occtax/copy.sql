@@ -83,8 +83,16 @@ ALTER TABLE gn_imports.:occtaxImportTable
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Create indexes on imports occtax table'
-\set uniqueIdIdx 'idx_unique_':occtaxImportTable'_unique_id_sinp_grp'
+\set uniqueIdIdx 'idx_unique_':occtaxImportTable'_unique_id_counting'
 CREATE UNIQUE INDEX :uniqueIdIdx
+    ON gn_imports.:occtaxImportTable USING btree (unique_id_sinp_occtax);
+
+\set occurenceIdIdx 'idx_':occtaxImportTable'_unique_id_occurence'
+CREATE INDEX :occurenceIdIdx
+    ON gn_imports.:occtaxImportTable USING btree (unique_id_occurence_occtax);
+
+\set surveyIdIdx 'idx_':occtaxImportTable'_unique_id_survey'
+CREATE INDEX :surveyIdIdx
     ON gn_imports.:occtaxImportTable USING btree (unique_id_sinp_grp);
 
 \set updateDateIdx 'idx_':occtaxImportTable'_meta_update_date'
