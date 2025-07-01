@@ -36,7 +36,7 @@ BEGIN
             id_dataset,
             id_digitiser,
             observers_txt,
-            id_nomenclature_tech_collect_campanule,
+--          id_nomenclature_tech_collect_campanule,
             id_nomenclature_grp_typ,
             grp_method,
             date_min,
@@ -56,22 +56,20 @@ BEGIN
             id_nomenclature_geo_object_nature,
             precision,
             additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            id_module
         )
         SELECT
             unique_id_sinp_grp,
             code_dataset,
             code_digitiser,
             observers,
-            code_nomenclature_tech_collect_campanule,
+--          code_nomenclature_tech_collect_campanule,
             code_nomenclature_grp_typ,
             grp_method,
-            date_min,
-            date_max,
-            hour_min,
-            hour_max,
+            date_min::DATE,
+            date_max::DATE,
+            date_min::TIME,
+            date_max::TIME,
             cd_hab,
             altitude_min,
             altitude_max,
@@ -80,14 +78,12 @@ BEGIN
             place_name,
             meta_device_entry,
             comment_context,
-            ST_Transform(geom, 4326),
             geom,
+            ST_Transform(geom, 4326),
             code_nomenclature_geo_object_nature,
             precision,
             additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            gn_commons.get_id_module_by_code('OCCTAX')
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
@@ -120,42 +116,40 @@ BEGIN
             id_nomenclature_determination_method,
             cd_nom,
             nom_cite,
-            meta_v_taref,
+            meta_v_taxref,
             sample_number_proof,
             digital_proof,
             non_digital_proof,
             comment,
             additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            id_releve_occtax
         )
         SELECT
-            unique_id_occurence_occtax,
-            code_nomenclature_obs_technique,
-            code_nomenclature_bio_condition,
-            code_nomenclature_bio_status,
-            code_nomenclature_naturalness,
-            code_nomenclature_exist_proof,
-            code_nomenclature_diffusion_level,
-            code_nomenclature_observation_status,
-            code_nomenclature_blurring,
-            code_nomenclature_source_status,
-            code_nomenclature_behaviour,
-            determiner,
-            code_nomenclature_determination_method,
-            cd_nom,
-            nom_cite,
-            meta_v_taxref,
-            sample_number_proof,
-            digital_proof,
-            non_digital_proof,
-            comment_description,
-            additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            ocit.unique_id_occurence_occtax,
+            ocit.code_nomenclature_obs_technique,
+            ocit.code_nomenclature_bio_condition,
+            ocit.code_nomenclature_bio_status,
+            ocit.code_nomenclature_naturalness,
+            ocit.code_nomenclature_exist_proof,
+            ocit.code_nomenclature_diffusion_level,
+            ocit.code_nomenclature_observation_status,
+            ocit.code_nomenclature_blurring,
+            ocit.code_nomenclature_source_status,
+            ocit.code_nomenclature_behaviour,
+            ocit.determiner,
+            ocit.code_nomenclature_determination_method,
+            ocit.cd_nom,
+            ocit.nom_cite,
+            ocit.meta_v_taxref,
+            NULL,
+            ocit.digital_proof,
+            ocit.non_digital_proof,
+            ocit.comment_description,
+            ocit.additional_fields,
+            relv.id_releve_occtax
         FROM gn_imports.${occtaxImportTable} AS ocit
+            LEFT JOIN pr_occtax.t_releves_occtax AS relv
+                ON relv.unique_id_sinp_grp = ocit.unique_id_sinp_grp
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM pr_occtax.t_occurrences_occtax AS too
@@ -173,30 +167,28 @@ BEGIN
         RAISE NOTICE 'Inserting counting occtax data to "cor_counting_occtax" if not exist' ;
         INSERT INTO pr_occtax.cor_counting_occtax (
             unique_id_sinp_occtax,
-            code_nomenclature_life_stage,
-            code_nomenclature_sex,
-            code_nomenclature_obj_count,
-            code_nomenclature_type_count,
+            id_nomenclature_life_stage,
+            id_nomenclature_sex,
+            id_nomenclature_obj_count,
+            id_nomenclature_type_count,
             count_min,
             count_max,
             additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            id_occurrence_occtax
         )
         SELECT
-            unique_id_sinp_occtax,
-            code_nomenclature_life_stage,
-            code_nomenclature_sex,
-            code_nomenclature_obj_count,
-            code_nomenclature_type_count,
-            count_min,
-            count_max,
-            additional_fields,
-            meta_create_date,
-            meta_update_date,
-            meta_last_action
+            ocit.unique_id_sinp_occtax,
+            ocit.code_nomenclature_life_stage,
+            ocit.code_nomenclature_sex,
+            ocit.code_nomenclature_obj_count,
+            ocit.code_nomenclature_type_count,
+            ocit.count_min,
+            ocit.count_max,
+            ocit.additional_fields,
+            occ.id_occurrence_occtax
         FROM gn_imports.${occtaxImportTable} AS ocit
+            LEFT JOIN pr_occtax.t_occurrences_occtax AS occ
+                ON occ.unique_id_occurence_occtax = ocit.unique_id_occurence_occtax
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM pr_occtax.cor_counting_occtax AS cco
