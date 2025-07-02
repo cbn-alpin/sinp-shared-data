@@ -86,13 +86,6 @@ BEGIN
             date_max::DATE,
             date_min::TIME,
             date_max::TIME,
-            code_nomenclature_tech_collect_campanule,
-            code_nomenclature_grp_typ::int,
-            grp_method,
-            date_min,
-            date_max,
-            hour_min,
-            hour_max,
             cd_hab,
             altitude_min,
             altitude_max,
@@ -126,7 +119,6 @@ BEGIN
         INSERT INTO pr_occtax.t_occurrences_occtax (
             unique_id_occurence_occtax,
             id_releve_occtax,
-            id_releve_occtax,
             id_nomenclature_obs_technique,
             id_nomenclature_bio_condition,
             id_nomenclature_bio_status,
@@ -145,8 +137,7 @@ BEGIN
             sample_number_proof,
             digital_proof,
             non_digital_proof,
-            comment,
-            additional_fields
+            comment
         )
         SELECT
             unique_id_occurence_occtax,
@@ -194,8 +185,7 @@ BEGIN
             id_nomenclature_obj_count,
             id_nomenclature_type_count,
             count_min,
-            count_max,
-            additional_fields
+            count_max
         )
         SELECT
             unique_id_sinp_occtax,

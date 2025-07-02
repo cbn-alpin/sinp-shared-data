@@ -478,7 +478,7 @@ $function$
 \echo '----------------------------------------------------------------------------'
 \echo 'Create function to get id_releve_occtax from unique_id_sinp_grp'
 
-CREATE OR REPLACE FUNCTION pr_occtax.get_id_survey_by_uuid(uuidGrp uuid)
+CREATE OR REPLACE FUNCTION pr_occtax.get_id_survey_by_uuid(uuidSurvey uuid)
  RETURNS integer
  LANGUAGE plpgsql
  IMMUTABLE
@@ -489,7 +489,7 @@ AS $function$
     BEGIN
         SELECT INTO idReleve id_releve_occtax
         FROM pr_occtax.t_releves_occtax AS tr
-        WHERE tr.unique_id_sinp_grp = my_unique_id_sinp_grp ;
+        WHERE tr.unique_id_sinp_grp = uuidSurvey ;
 
         RETURN idReleve ;
 
