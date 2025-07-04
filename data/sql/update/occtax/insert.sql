@@ -80,7 +80,7 @@ BEGIN
             code_digitiser,
             observers,
             code_nomenclature_tech_collect_campanule,
-            code_nomenclature_grp_typ,
+            code_nomenclature_grp_typ::int,
             grp_method,
             date_min::DATE,
             date_max::DATE,
