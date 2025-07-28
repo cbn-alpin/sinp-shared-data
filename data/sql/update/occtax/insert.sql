@@ -215,6 +215,20 @@ BEGIN
 END
 $$ ;
 
+        RAISE NOTICE '-------------------------------------------------' ;
+        RAISE NOTICE 'Inserting link between roles and releves from occtax data to "cor_role_releves_occtax" if not exist' ;
+
+        -- Import dans pr_occtax.cor_role_releves_occtax
+        INSERT INTO pr_occtax.cor_role_releves_occtax (
+            id_releve_occtax,
+            id_role
+        )
+        SELECT
+            pr_occtax.get_id_survey_by_uuid(unique_id_sinp_grp),
+            code_digitiser
+        FROM gn_imports.${occtaxImportTable} AS ocit
+        WHERE meta_last_action = 'I';
+
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
