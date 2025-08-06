@@ -220,7 +220,8 @@ CREATE OR REPLACE FUNCTION utilisateurs.get_id_group_by_name(groupName character
     RETURNS integer
     LANGUAGE plpgsql
     IMMUTABLE
-AS $function$
+AS
+$function$
     -- Function which return the id_role of a group by its name
     DECLARE idRole integer;
 
@@ -340,7 +341,9 @@ $function$ ;
 CREATE OR REPLACE FUNCTION gn_imports.computeImportTotal(
     tableImport VARCHAR, actionImport VARCHAR, OUT total integer
 )
-LANGUAGE plpgsql AS $function$
+    LANGUAGE plpgsql
+AS
+$function$
     DECLARE
         schemaImport VARCHAR ;
         parsed_ident VARCHAR[] ;
@@ -363,14 +366,14 @@ LANGUAGE plpgsql AS $function$
             schemaImport, tableImport
         ) USING actionImport INTO total ;
     END;
-$function$;
+$function$ ;
 
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "computeImportStep()"'
 CREATE OR REPLACE FUNCTION gn_imports.computeImportStep(total INT)
-RETURNS INT
-LANGUAGE plpgsql
+    RETURNS INT
+    LANGUAGE plpgsql
 AS
 $function$
     BEGIN
@@ -382,7 +385,7 @@ $function$
             RETURN 500000;
         END IF;
     END;
-$function$;
+$function$ ;
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "clean_observers_uuid()"'
@@ -392,7 +395,7 @@ CREATE OR REPLACE FUNCTION gn_imports.clean_observers_uuid(observersImported var
     SECURITY DEFINER
 AS
 $function$
-    --
+    -- Function which clean the observers imported string
     DECLARE
         observersExported text;
 
@@ -409,80 +412,80 @@ $function$ ;
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "public.fct_trg_meta_dates_change()"'
 CREATE OR REPLACE FUNCTION public.fct_trg_meta_dates_change()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
--- Modify function to keep origin date when exists.
-BEGIN
-        IF(TG_OP = 'INSERT') THEN
-                -- Test if NEW.meta_create_date is null or empty
-                if (NEW.meta_create_date IS NULL) THEN
-                        NEW.meta_create_date = NOW();
-                END IF;
-        ELSIF(TG_OP = 'UPDATE') THEN
-                -- Test if NEW.meta_create_date is null or empty
-                if (NEW.meta_create_date IS NULL) THEN
-                    NEW.meta_update_date = NOW();
-                END IF;
-
-                -- Test if NEW.meta_update_date is null or empty
-                if (NEW.meta_update_date IS NULL) THEN
-                        NEW.meta_create_date = NOW();
-                END IF;
-        END IF;
-        return NEW;
-END;
+    RETURNS trigger
+    LANGUAGE plpgsql
+AS
 $function$
-;
+    -- Modify function to keep origin date when exists.
+    BEGIN
+        IF(TG_OP = 'INSERT') THEN
+            -- Test if NEW.meta_create_date is null or empty
+            if (NEW.meta_create_date IS NULL) THEN
+                NEW.meta_create_date = NOW();
+            END IF;
+        ELSIF(TG_OP = 'UPDATE') THEN
+            -- Test if NEW.meta_create_date is null or empty
+            if (NEW.meta_create_date IS NULL) THEN
+                NEW.meta_update_date = NOW();
+            END IF;
+
+            -- Test if NEW.meta_update_date is null or empty
+            if (NEW.meta_update_date IS NULL) THEN
+                NEW.meta_create_date = NOW();
+            END IF;
+        END IF;
+        RETURN NEW;
+    END;
+$function$ ;
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "utilisateurs.modify_date_insert()"'
 -- Modify function to keep origin date when exists.
 CREATE OR REPLACE FUNCTION utilisateurs.modify_date_insert()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
--- Modify function to keep origin date when exists.
-BEGIN
-    -- Test if NEW.date_insert is null or empty
-    IF (NEW.date_insert IS NULL) THEN
-        NEW.date_insert := NOW();
-    END IF;
-    -- Test if NEW.date_update is null or empty
-    IF (NEW.date_update IS NULL) THEN
-        NEW.date_update := NOW();
-    END IF;
-    RETURN NEW;
-END;
+    RETURNS trigger
+    LANGUAGE plpgsql
+AS
 $function$
-;
+    -- Modify function to keep origin date when exists.
+    BEGIN
+        -- Test if NEW.date_insert is null or empty
+        IF (NEW.date_insert IS NULL) THEN
+            NEW.date_insert := NOW();
+        END IF;
+        -- Test if NEW.date_update is null or empty
+        IF (NEW.date_update IS NULL) THEN
+            NEW.date_update := NOW();
+        END IF;
+        RETURN NEW;
+    END;
+$function$ ;
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "utilisateurs.modify_date_update()"'
 CREATE OR REPLACE FUNCTION utilisateurs.modify_date_update()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
--- Modify function to keep origin date when exists.
-BEGIN
-    -- Test if NEW.date_update is null or empty
-    IF (NEW.date_update IS NULL) THEN
-        NEW.date_update := NOW();
-    END IF;
-    RETURN NEW;
-END;
+    RETURNS trigger
+    LANGUAGE plpgsql
+AS
 $function$
-;
-
+    -- Modify function to keep origin date when exists.
+    BEGIN
+        -- Test if NEW.date_update is null or empty
+        IF (NEW.date_update IS NULL) THEN
+            NEW.date_update := NOW();
+        END IF;
+        RETURN NEW;
+    END;
+$function$ ;
 
 \echo '----------------------------------------------------------------------------'
 \echo 'Create function to get id_releve_occtax from unique_id_sinp_grp'
 
 CREATE OR REPLACE FUNCTION pr_occtax.get_id_survey_by_uuid(uuidSurvey uuid)
- RETURNS integer
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
+    RETURNS integer
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
     -- Function which return the id_releve from an unique_id_sinp_grp
     DECLARE idReleve integer;
 
@@ -492,19 +495,18 @@ AS $function$
         WHERE tr.unique_id_sinp_grp = uuidSurvey ;
 
         RETURN idReleve ;
-
     END;
-$function$
-;
+$function$ ;
 
 \echo '----------------------------------------------------------------------------'
 \echo 'Create function to get id_occurence_occtax from unique_id_occurence_occtax'
 
 CREATE OR REPLACE FUNCTION pr_occtax.get_id_occurrence_by_uuid(uuidOccurrence uuid)
- RETURNS integer
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
+    RETURNS integer
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
     -- Function which return the id_occurence from an unique_id_occurence_occtax
     DECLARE idOccurence integer;
 
@@ -514,11 +516,66 @@ AS $function$
         WHERE toc.unique_id_occurence_occtax = uuidOccurrence ;
 
         RETURN idOccurence ;
-
     END;
-$function$
-;
+$function$ ;
 
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "public.get_materialized_view_dependencies()"'
+CREATE OR REPLACE FUNCTION public.get_materialized_view_dependencies(mvName text)
+    RETURNS TABLE (kind text, "name" text)
+    LANGUAGE SQL
+AS
+$function$
+    -- Function which return the dependencies of a materialized view
+    -- Src: https://gist.github.com/bitdivine/4b63fb088fd8fd58d61ffb8246d07369
+    -- Src: https://stackoverflow.com/a/4337615
+    SELECT
+        cl_d.relkind::text as kind,
+        cl_d.relname::text AS "name"
+    FROM pg_rewrite AS r
+        JOIN pg_class AS cl_r
+            ON r.ev_class = cl_r.oid
+        JOIN pg_depend AS d
+            ON r.oid = d.objid
+        JOIN pg_class AS cl_d
+            ON d.refobjid = cl_d.oid
+    WHERE cl_d.relkind IN ('m')
+        AND cl_r.relname = $1
+        AND cl_d.relname != $1
+    GROUP BY cl_d.relname, cl_d.relkind
+    ORDER BY cl_d.relname ;
+$function$ ;
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "public.get_materialized_view_dependencies()"'
+CREATE OR REPLACE FUNCTION public.refresh_recursive_concurrently(mvName text)
+    RETURNS TABLE("action" text, kind text, "object" text)
+    LANGUAGE plpgsql
+AS
+$function$
+    -- Function which refresh recursively a materialized view and its dependencies
+    -- Src: https://gist.github.com/bitdivine/4b63fb088fd8fd58d61ffb8246d07369
+    DECLARE parentMvName text ;
+    BEGIN
+        FOR parentMvName IN SELECT name FROM public.get_materialized_view_dependencies(mvName)
+        LOOP
+            RETURN QUERY
+                SELECT 'explore'::text, relkind::text, relname::text
+                FROM pg_class
+                WHERE relname = mvName ;
+            RETURN QUERY SELECT * FROM public.refresh_recursive_concurrently(parentMvName) ;
+        END LOOP;
+
+        FOR parentMvName IN SELECT relname FROM pg_class WHERE relname = mvName AND relkind = 'm'
+        LOOP
+            RETURN QUERY
+                SELECT 'refresh'::text, relkind::text, relname::text
+                FROM pg_class
+                WHERE relname = mvName ;
+            EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY ' || parentMvName ;
+        END LOOP;
+    END;
+$function$ ;
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
