@@ -24,10 +24,10 @@ DO $$
             FROM pg_matviews
             WHERE schemaname = 'gn_synthese' AND matviewname = 'v_synthese_for_export'
         ) IS TRUE THEN
-            RAISE NOTICE ' "gn_synthese.v_synthese_for_export" is a materialized view => refresh !' ;
-            REFRESH MATERIALIZED VIEW CONCURRENTLY gn_synthese.v_synthese_for_export ;
+            RAISE NOTICE ' It''s a materialized view => refresh with dependencies concurrently!' ;
+            SELECT public.refresh_recursive_concurrently('v_synthese_for_export') ;
         ELSE
-            RAISE NOTICE ' "gn_synthese.v_synthese_for_export" is not a materialized view => NO refresh !' ;
+            RAISE NOTICE ' It''s not a materialized view => NO refresh !' ;
         END IF ;
     END
 $$ ;
