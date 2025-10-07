@@ -478,46 +478,62 @@ $function$
 $function$ ;
 
 \echo '----------------------------------------------------------------------------'
-\echo 'Create function to get id_releve_occtax from unique_id_sinp_grp'
+\echo 'Verify if "pr_occtax" schema exists'
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.schemata
+        WHERE schema_name = 'pr_occtax'
+    ) THEN
+        RAISE NOTICE 'Schema "pr_occtax" found.';
 
-CREATE OR REPLACE FUNCTION pr_occtax.get_id_survey_by_uuid(uuidSurvey uuid)
-    RETURNS integer
-    LANGUAGE plpgsql
-    IMMUTABLE
-AS
-$function$
-    -- Function which return the id_releve from an unique_id_sinp_grp
-    DECLARE idReleve integer;
+        RAISE NOTICE 'Create function to get id_releve_occtax from unique_id_sinp_grp';
 
-    BEGIN
-        SELECT INTO idReleve id_releve_occtax
-        FROM pr_occtax.t_releves_occtax AS tr
-        WHERE tr.unique_id_sinp_grp = uuidSurvey ;
+        CREATE OR REPLACE FUNCTION pr_occtax.get_id_survey_by_uuid(uuidSurvey uuid)
+            RETURNS integer
+            LANGUAGE plpgsql
+            IMMUTABLE
+        AS
+        $function$
+            -- Function which return the id_releve from an unique_id_sinp_grp
+            DECLARE idReleve integer;
 
-        RETURN idReleve ;
-    END;
-$function$ ;
+            BEGIN
+                SELECT INTO idReleve id_releve_occtax
+                FROM pr_occtax.t_releves_occtax AS tr
+                WHERE tr.unique_id_sinp_grp = uuidSurvey ;
 
-\echo '----------------------------------------------------------------------------'
-\echo 'Create function to get id_occurence_occtax from unique_id_occurence_occtax'
+                RETURN idReleve ;
+            END;
+        $function$ ;
 
-CREATE OR REPLACE FUNCTION pr_occtax.get_id_occurrence_by_uuid(uuidOccurrence uuid)
-    RETURNS integer
-    LANGUAGE plpgsql
-    IMMUTABLE
-AS
-$function$
-    -- Function which return the id_occurence from an unique_id_occurence_occtax
-    DECLARE idOccurence integer;
+        RAISE NOTICE 'Create function to get id_occurence_occtax from unique_id_occurence_occtax';
 
-    BEGIN
-        SELECT INTO idOccurence id_occurrence_occtax
-        FROM pr_occtax.t_occurrences_occtax AS toc
-        WHERE toc.unique_id_occurence_occtax = uuidOccurrence ;
+        CREATE OR REPLACE FUNCTION pr_occtax.get_id_occurrence_by_uuid(uuidOccurrence uuid)
+            RETURNS integer
+            LANGUAGE plpgsql
+            IMMUTABLE
+        AS
+        $function$
+            -- Function which return the id_occurence from an unique_id_occurence_occtax
+            DECLARE idOccurence integer;
 
-        RETURN idOccurence ;
-    END;
-$function$ ;
+            BEGIN
+                SELECT INTO idOccurence id_occurrence_occtax
+                FROM pr_occtax.t_occurrences_occtax AS toc
+                WHERE toc.unique_id_occurence_occtax = uuidOccurrence ;
+
+                RETURN idOccurence ;
+            END;
+        $function$ ;
+    ELSE
+        RAISE NOTICE 'Schema "pr_occtax" not found. Skip functions creation';
+    END IF;
+END
+$$;
+
+
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "public.get_materialized_view_dependencies()"'
