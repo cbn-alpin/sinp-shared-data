@@ -387,6 +387,7 @@ $function$
     END;
 $function$ ;
 
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "clean_observers_uuid()"'
 CREATE OR REPLACE FUNCTION gn_imports.clean_observers_uuid(observersImported varchar)
@@ -408,6 +409,7 @@ $function$
         RETURN observersExported;
     END;
 $function$ ;
+
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "public.fct_trg_meta_dates_change()"'
@@ -438,6 +440,7 @@ $function$
     END;
 $function$ ;
 
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "utilisateurs.modify_date_insert()"'
 -- Modify function to keep origin date when exists.
@@ -460,6 +463,7 @@ $function$
     END;
 $function$ ;
 
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "utilisateurs.modify_date_update()"'
 CREATE OR REPLACE FUNCTION utilisateurs.modify_date_update()
@@ -476,6 +480,7 @@ $function$
         RETURN NEW;
     END;
 $function$ ;
+
 
 \echo '----------------------------------------------------------------------------'
 \echo 'Verify if "pr_occtax" schema exists'
@@ -534,7 +539,6 @@ END
 $$;
 
 
-
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "public.get_materialized_view_dependencies()"'
 CREATE OR REPLACE FUNCTION public.get_materialized_view_dependencies(mvName text)
@@ -562,8 +566,9 @@ $function$
     ORDER BY cl_d.relname ;
 $function$ ;
 
+
 \echo '-------------------------------------------------------------------------------'
-\echo 'Set function "public.get_materialized_view_dependencies()"'
+\echo 'Set function "public.refresh_recursive_concurrently()"'
 CREATE OR REPLACE FUNCTION public.refresh_recursive_concurrently(mvName text)
     RETURNS TABLE("action" text, kind text, "object" text)
     LANGUAGE plpgsql
@@ -582,7 +587,14 @@ $function$
             RETURN QUERY SELECT * FROM public.refresh_recursive_concurrently(parentMvName) ;
         END LOOP;
 
-        FOR parentMvName IN SELECT relname FROM pg_class WHERE relname = mvName AND relkind = 'm'
+        FOR parentMvName IN (
+            SELECT n.nspname || '.' || c.relname
+            FROM pg_class AS c
+                JOIN pg_namespace AS n
+                    ON c.relnamespace = n.oid
+            WHERE relname = mvName
+                AND relkind = 'm'
+        )
         LOOP
             RETURN QUERY
                 SELECT 'refresh'::text, relkind::text, relname::text
@@ -592,6 +604,7 @@ $function$
         END LOOP;
     END;
 $function$ ;
+
 
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
