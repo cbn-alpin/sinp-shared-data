@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS gn_synthese.area_syntheses_other AS (
             ON st_intersects(s.the_geom_local, a.geom)
 ) ;
 
-\echo ' Create index on column area_id for area_syntheses table'
+\echo ' Create index on column area_id for area_syntheses_other table'
 CREATE INDEX IF NOT EXISTS idx_area_syntheses_other_area_id
 ON gn_synthese.area_syntheses_other USING btree(area_id) ;
 

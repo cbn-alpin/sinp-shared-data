@@ -19,6 +19,38 @@ BEGIN;
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Create subdivided other enable areas (not admin zones or meshes) for temporary table'
+
+\echo 'Drop subdivided other enable areas table'
+DROP TABLE IF EXISTS ref_geo.subdivided_areas_other ;
+
+\echo ' Add subdivided other enable areas table'
+-- SINP AURA Preprod:
+CREATE TABLE IF NOT EXISTS ref_geo.subdivided_areas_other AS
+    SELECT
+        random() AS gid,
+        a.id_area AS area_id,
+        bat.type_code AS code_type,
+        a.area_code,
+        st_subdivide(a.geom, 250) AS geom
+    FROM ref_geo.l_areas AS a
+        JOIN ref_geo.bib_areas_types AS bat
+            ON bat.id_type = a.id_type
+    WHERE a."enable" = TRUE
+        AND bat.type_code NOT IN (
+            'REG', 'DEP', 'COM', 'M1', 'M2', 'M5', 'M10', 'M20', 'M50', 'SINP'
+        ) ;
+
+\echo ' Create index on geom column for subdivided other enable areas table'
+CREATE INDEX IF NOT EXISTS idx_subdivided_areas_other_enable_geom
+ON ref_geo.subdivided_areas_other USING gist(geom);
+
+\echo ' Create index on column id_area for subdivided other enable areas table'
+CREATE INDEX IF NOT EXISTS idx_subdivided_areas_other_enable_id
+ON ref_geo.subdivided_areas_other USING btree(area_id) ;
+
+
+\echo '----------------------------------------------------------------------------'
 \echo 'Create subdivided REG, DEP and COM areas table'
 
 \echo ' Drop subdivided REG, DEP and COM areas table'
@@ -150,6 +182,25 @@ ON gn_synthese.synthese_geom_dep USING gist(geom);
 \echo ' Create index on column area_code for synthese_geom_dep table'
 CREATE INDEX IF NOT EXISTS idx_synthese_geom_dep_area_code
 ON gn_synthese.synthese_geom_dep USING btree(area_code) ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Drop area_syntheses_other table'
+DROP TABLE IF EXISTS gn_synthese.area_syntheses_other ;
+
+\echo 'Create area_syntheses_other temporary table'
+CREATE TABLE IF NOT EXISTS gn_synthese.area_syntheses_other AS (
+    SELECT DISTINCT
+        s.id_syntheses,
+        a.area_id
+    FROM gn_synthese.geom_synthese AS s
+        JOIN ref_geo.subdivided_areas_other AS a
+            ON st_intersects(s.the_geom_local, a.geom)
+) ;
+
+\echo ' Create index on column area_id for area_syntheses_other table'
+CREATE INDEX IF NOT EXISTS idx_area_syntheses_other_area_id
+ON gn_synthese.area_syntheses_other USING btree(area_id) ;
 
 
 \echo '----------------------------------------------------------------------------'
@@ -372,6 +423,53 @@ BEGIN
     END LOOP;
 END $$;
 
+\echo '----------------------------------------------------------------------------'
+\echo 'Reinsert other enable areas'
+
+DO $$
+DECLARE
+    step INTEGER;
+    stopAt INTEGER;
+    offsetCnt INTEGER := 0 ;
+    affectedRows INTEGER;
+BEGIN
+    -- Set dynamicly stopAt and step
+    SELECT COUNT(*) INTO stopAt FROM gn_synthese.area_syntheses_other ;
+    step := gn_imports.computeImportStep(stopAt) ;
+    RAISE NOTICE 'Total found: %, step used: %', stopAt, step ;
+
+    RAISE NOTICE 'Start to loop on data to insert in "synthese" table' ;
+    WHILE offsetCnt < stopAt LOOP
+
+        RAISE NOTICE '-------------------------------------------------' ;
+        RAISE NOTICE 'Try to insert % observations from %', step, offsetCnt ;
+
+        WITH zones AS (
+            SELECT
+                id_syntheses,
+                area_id
+            FROM gn_synthese.area_syntheses_other AS a
+            ORDER BY a.area_id ASC
+            OFFSET offsetCnt
+            LIMIT step
+        )
+        INSERT INTO gn_synthese.cor_area_synthese (
+            id_synthese,
+            id_area
+        )
+            SELECT
+                UNNEST(id_syntheses) AS id_synthese,
+                area_id
+            FROM zones ;
+
+        GET DIAGNOSTICS affectedRows = ROW_COUNT;
+        RAISE NOTICE 'Inserted cor_area_synthese rows: %', affectedRows ;
+
+        offsetCnt := offsetCnt + (step) ;
+    END LOOP ;
+END
+$$ ;
+
 
 \echo '----------------------------------------------------------------------------'
 \echo 'Reinsert Régions, Départements and Communes into cor_area_synthese'
@@ -544,6 +642,9 @@ $$ ;
 \echo '----------------------------------------------------------------------------'
 \echo 'Clean all temporary tables'
 
+\echo ' Drop subdivided other enable areas table'
+DROP TABLE IF EXISTS ref_geo.subdivided_areas_other ;
+
 \echo ' Drop subdivided REG, DEP and COM areas table'
 DROP TABLE IF EXISTS ref_geo.subdivided_areas ;
 
@@ -555,6 +656,9 @@ DROP TABLE IF EXISTS ref_geo.flatten_meshes ;
 
 \echo ' Drop synthese_geom_dep table'
 DROP TABLE IF EXISTS gn_synthese.synthese_geom_dep ;
+
+\echo ' Drop area_syntheses_other table'
+DROP TABLE IF EXISTS gn_synthese.area_syntheses_other ;
 
 \echo ' Drop area_syntheses table'
 DROP TABLE IF EXISTS gn_synthese.area_syntheses ;
