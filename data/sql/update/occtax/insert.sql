@@ -98,7 +98,7 @@ BEGIN
             ST_Transform(geom, 4326),
             code_nomenclature_geo_object_nature,
             precision,
-            additional_fields,
+            additional_fields_releve,
             gn_commons.get_id_module_by_code('OCCTAX')
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
@@ -137,10 +137,11 @@ BEGIN
             sample_number_proof,
             digital_proof,
             non_digital_proof,
-            comment
+            comment,
+            additional_fields
         )
         SELECT
-            unique_id_occurence_occtax,
+            unique_id_occurence,
             pr_occtax.get_id_survey_by_uuid(unique_id_sinp_grp),
             code_nomenclature_obs_technique,
             code_nomenclature_bio_condition,
@@ -160,12 +161,13 @@ BEGIN
             sample_number_proof,
             digital_proof,
             non_digital_proof,
-            comment_description
+            comment_description,
+            additional_fields_occurence
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM pr_occtax.t_occurrences_occtax AS too
-                WHERE too.unique_id_occurence_occtax = ocit.unique_id_occurence_occtax
+                WHERE too.unique_id_occurence_occtax = ocit.unique_id_occurrence
             )
             AND ocit.meta_last_action = 'I'
         ORDER BY ocit.gid ASC
@@ -185,22 +187,24 @@ BEGIN
             id_nomenclature_obj_count,
             id_nomenclature_type_count,
             count_min,
-            count_max
+            count_max,
+            additional_fields
         )
         SELECT
-            unique_id_sinp_occtax,
+            unique_id_counting,
             pr_occtax.get_id_occurrence_by_uuid(unique_id_occurence_occtax),
             code_nomenclature_life_stage,
             code_nomenclature_sex,
             code_nomenclature_obj_count,
             code_nomenclature_type_count,
             count_min,
-            count_max
+            count_max,
+            additional_fields_counting
         FROM gn_imports.${occtaxImportTable} AS ocit
         WHERE NOT EXISTS (
                 SELECT 'X'
                 FROM pr_occtax.cor_counting_occtax AS cco
-                WHERE cco.unique_id_sinp_occtax = ocit.unique_id_sinp_occtax
+                WHERE cco.unique_id_sinp_occtax = ocit.unique_id_counting
             )
             AND ocit.meta_last_action = 'I'
         ORDER BY ocit.gid ASC
