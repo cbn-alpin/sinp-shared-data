@@ -320,6 +320,27 @@ $function$
 $function$ ;
 
 
+\echo '----------------------------------------------------------------------------'
+\echo 'Set function "get_id_scope_by_label()"'
+CREATE OR REPLACE FUNCTION gn_permissions.get_id_scope_by_label(scopeLabel character varying)
+    RETURNS int
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the id_object from an object code
+    DECLARE idScope INTEGER;
+
+    BEGIN
+        SELECT value INTO idScope
+        FROM gn_permissions.bib_filters_scope
+        WHERE label = scopeLabel ;
+
+        RETURN idScope ;
+    END ;
+$function$ ;
+
+
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "reset_sequence()"'
 CREATE OR REPLACE FUNCTION public.reset_sequence(table_schema text, tablename text, columnname text, sequence_name text)
@@ -602,6 +623,46 @@ $function$
                 WHERE relname = mvName ;
             EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY ' || parentMvName ;
         END LOOP;
+    END;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "taxonomie.get_id_theme_by_name()"'
+CREATE OR REPLACE FUNCTION taxonomie.get_id_theme_by_name(themename character varying)
+ RETURNS integer
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+    -- Function which return the id_theme from Taxhub Attributs theme
+    DECLARE idTheme integer;
+
+    BEGIN
+        SELECT INTO idTheme id_theme
+        FROM taxonomie.bib_themes
+        WHERE nom_theme = themeName ;
+
+        RETURN idTheme ;
+    END;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "taxonomie.get_id_attribut_by_name()"'
+CREATE OR REPLACE FUNCTION taxonomie.get_id_attribut_by_name(attname character varying)
+ RETURNS integer
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+    -- Function which return the id_attribut from Taxhub Attributs
+    DECLARE idAttribut integer;
+
+    BEGIN
+        SELECT INTO idAttribut id_attribut
+        FROM taxonomie.bib_attributs
+        WHERE nom_attribut = attName ;
+
+        RETURN idAttribut ;
     END;
 $function$ ;
 
