@@ -173,6 +173,27 @@ $function$ ;
 
 
 \echo '-------------------------------------------------------------------------------'
+\echo 'Set function "get_uuid_organism_by_id()"'
+CREATE OR REPLACE FUNCTION utilisateurs.get_uuid_organism_by_id(oId INT)
+    RETURNS uuid
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the organism UUID from an organisme ID
+    DECLARE uuidOrganism UUID;
+
+    BEGIN
+        SELECT INTO uuidOrganism uuid_organisme
+        FROM utilisateurs.bib_organismes AS bo
+        WHERE bo.id_organisme = oId ;
+
+        RETURN uuidOrganism ;
+    END;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
 \echo 'Set function "get_id_role_by_identifier()"'
 CREATE OR REPLACE FUNCTION utilisateurs.get_id_role_by_identifier(identifier character varying)
     RETURNS integer
@@ -215,6 +236,27 @@ $function$ ;
 
 
 \echo '-------------------------------------------------------------------------------'
+\echo 'Set function "get_uuid_by_id_role()"'
+CREATE OR REPLACE FUNCTION utilisateurs.get_uuid_by_id_role(roleId INT)
+    RETURNS UUID
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the id_role from an uuid_role
+    DECLARE uuidRole UUID;
+
+    BEGIN
+        SELECT INTO uuidRole r.uuid_role
+        FROM utilisateurs.t_roles AS r
+        WHERE r.id_role = roleId ;
+
+        RETURN uuidRole ;
+    END;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
 \echo 'Set function"get_id_group_by_name()"'
 CREATE OR REPLACE FUNCTION utilisateurs.get_id_group_by_name(groupName character varying)
     RETURNS integer
@@ -235,6 +277,49 @@ $function$
     END;
 $function$ ;
 
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function"get_id_app_by_code()"'
+CREATE OR REPLACE FUNCTION utilisateurs.get_id_app_by_code(appCode character varying)
+    RETURNS integer
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the id_application of an application by its code
+    DECLARE idApp integer;
+
+    BEGIN
+        SELECT INTO idApp a.id_application
+        FROM utilisateurs.t_applications AS a
+        WHERE a.code_application = appCode ;
+
+        RETURN idApp ;
+    END;
+$function$ ;
+
+
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function"get_id_profil_by_name()"'
+CREATE OR REPLACE FUNCTION utilisateurs.get_id_profil_by_name(profilName character varying)
+    RETURNS integer
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the id_profil of a profil by its name
+    DECLARE idProfil integer;
+
+    BEGIN
+        SELECT INTO idProfil p.id_profil
+        FROM utilisateurs.t_profils AS p
+        WHERE p.nom_profil = profilName ;
+
+        RETURN idProfil ;
+    END;
+$function$ ;
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "get_id_source_by_name()"'
