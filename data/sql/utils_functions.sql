@@ -427,18 +427,54 @@ $function$ ;
 
 
 \echo '-------------------------------------------------------------------------------'
-\echo 'Set function "reset_sequence()"'
-CREATE OR REPLACE FUNCTION public.reset_sequence(table_schema text, tablename text, columnname text, sequence_name text)
+\echo 'Set DEPRECATED LEGACY function "reset_sequence()"'
+DROP FUNCTION IF EXISTS reset_sequence(text,text,text,text) ;
+CREATE OR REPLACE FUNCTION public.reset_sequence(tableSchema text, tableName text, columnName text, sequenceName text)
     RETURNS "pg_catalog"."void"
     LANGUAGE plpgsql
 AS
 $function$
-      DECLARE
-      BEGIN
-        EXECUTE 'LOCK TABLE ' || table_schema || '.'|| tablename || ' IN EXCLUSIVE MODE ;' ;
-        EXECUTE 'SELECT setval( ''' || sequence_name  || ''', ' || '(SELECT MAX(' || columnname ||
-            ') FROM ' || table_schema || '.'|| tablename || ')' || '+1)' ;
-      END ;
+    BEGIN
+        RAISE INFO 'reset_sequence() function with sequenceName parameter is DEPRECATED. Use it witout sequenceName (%).', sequenceName ;
+        PERFORM public.reset_sequence(tableSchema, tableName, columnName) ;
+    END ;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "reset_sequence()"'
+DROP FUNCTION IF EXISTS reset_sequence(text,text,text) ;
+CREATE OR REPLACE FUNCTION public.reset_sequence(tableSchema text, tableName text, columnName text)
+    RETURNS INT
+    LANGUAGE plpgsql
+AS
+$function$
+    DECLARE
+        fullTableName text;
+        seqName text;
+        maxId bigint;
+    BEGIN
+
+        fullTableName := format('%I.%I', tableSchema, tableName);
+        EXECUTE format('LOCK TABLE %s IN EXCLUSIVE MODE', fullTableName);
+        seqName := pg_get_serial_sequence(fullTableName, columnName);
+
+        IF seqName IS NULL THEN
+            RAISE INFO 'Sequence not found for table % and column %', fullTableName, columnName;
+            RETURN 0;
+        END IF;
+
+        EXECUTE format('SELECT MAX(%I) FROM %s', columnName, fullTableName)
+        INTO maxId;
+
+        IF maxId IS NULL THEN
+            PERFORM setval(seqName, 1, false);
+            RETURN 1 ;
+        ELSE
+            PERFORM setval(seqName, maxId);
+            RETURN maxId ;
+        END IF;
+    END ;
 $function$ ;
 
 
