@@ -53,5 +53,20 @@ $$ ;
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Delete validations data to gn_commons.t_validations for deleted observations'
+
+WITH validations_to_delete AS (
+    SELECT
+        sit.unique_id_sinp::uuid AS uuid_attached_row
+    FROM gn_imports.${syntheseImportTable} AS sit
+    WHERE sit.meta_last_action = 'D'
+        AND sit.id_nomenclature_valid_status IS NOT NULL
+)
+DELETE FROM gn_commons.t_validations AS v
+USING validations_to_delete AS vtd
+WHERE v.uuid_attached_row = vtd.uuid_attached_row ;
+
+
+\echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
 COMMIT;

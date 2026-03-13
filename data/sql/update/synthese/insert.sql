@@ -246,5 +246,38 @@ ALTER TABLE gn_synthese.cor_observer_synthese ADD CONSTRAINT fk_gn_synthese_id_s
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Disable triggers on gn_commons.t_validations'
+ALTER TABLE gn_commons.t_validations
+    DISABLE TRIGGER tri_insert_synthese_update_validation_status ;
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Add validations data to gn_commons.t_validations'
+INSERT INTO gn_commons.t_validations (
+    uuid_attached_row,
+    id_nomenclature_valid_status,
+    validation_auto,
+    id_validator,
+    validation_comment,
+    validation_date
+)
+    SELECT
+        unique_id_sinp::uuid AS uuid_attached_row,
+        id_nomenclature_valid_status,
+        FALSE AS validation_auto,
+        utilisateurs.get_one_role_id_from_uuid_in_string(validator) AS id_validator,
+        gn_commons.format_validation_comment(validation_comment, validator) AS validation_comment,
+        validation_date
+    FROM gn_imports.${syntheseImportTable}
+    WHERE meta_last_action = 'I'
+        AND id_nomenclature_valid_status IS NOT NULL
+ON CONFLICT DO NOTHING ;
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Disable triggers on gn_commons.t_validations'
+ALTER TABLE gn_commons.t_validations
+    ENABLE TRIGGER tri_insert_synthese_update_validation_status ;
+
+
+\echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
 COMMIT;

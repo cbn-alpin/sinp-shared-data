@@ -253,5 +253,69 @@ ALTER TABLE gn_synthese.cor_observer_synthese ADD CONSTRAINT fk_gn_synthese_id_s
 
 
 \echo '----------------------------------------------------------------------------'
+\echo 'Disable triggers on gn_commons.t_validations'
+ALTER TABLE gn_commons.t_validations
+    DISABLE TRIGGER tri_insert_synthese_update_validation_status ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Add validations data to gn_commons.t_validations for updated observations'
+WITH validations_to_upsert AS (
+    SELECT
+        sit.unique_id_sinp::uuid AS uuid_attached_row,
+        sit.id_nomenclature_valid_status,
+        FALSE AS validation_auto,
+        utilisateurs.get_one_role_id_from_uuid_in_string(sit.validator) AS id_validator,
+        gn_commons.format_validation_comment(sit.validation_comment, sit.validator) AS validation_comment,
+        sit.validation_date
+    FROM gn_imports.${syntheseImportTable} AS sit
+    WHERE sit.meta_last_action = 'U'
+        AND sit.id_nomenclature_valid_status IS NOT NULL
+),
+updated AS (
+    UPDATE gn_commons.t_validations AS v SET
+        id_nomenclature_valid_status = vtu.id_nomenclature_valid_status,
+        id_validator = vtu.id_validator,
+        validation_comment = vtu.validation_comment
+    FROM validations_to_upsert AS vtu
+    WHERE v.uuid_attached_row = vtu.uuid_attached_row
+        AND v.validation_date = vtu.validation_date
+    RETURNING v.uuid_attached_row, v.validation_date
+),
+inserted AS (
+    INSERT INTO gn_commons.t_validations (
+        uuid_attached_row,
+        id_nomenclature_valid_status,
+        validation_auto,
+        id_validator,
+        validation_comment,
+        validation_date
+    )
+    SELECT
+        vtu.uuid_attached_row,
+        vtu.id_nomenclature_valid_status,
+        vtu.validation_auto,
+        vtu.id_validator,
+        vtu.validation_comment,
+        vtu.validation_date
+    FROM validations_to_upsert AS vtu
+        LEFT JOIN updated AS u
+            ON vtu.uuid_attached_row = u.uuid_attached_row AND vtu.validation_date = u.validation_date
+    WHERE u.uuid_attached_row IS NULL
+    RETURNING uuid_attached_row
+)
+SELECT
+    (SELECT count(*) FROM validations_to_upsert) AS validations_to_upsert_count,
+    (SELECT count(*) FROM updated) AS updated_count,
+    (SELECT count(*) FROM inserted) AS inserted_count ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Enable triggers on gn_commons.t_validations'
+ALTER TABLE gn_commons.t_validations
+    ENABLE TRIGGER tri_insert_synthese_update_validation_status ;
+
+
+\echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
 COMMIT;

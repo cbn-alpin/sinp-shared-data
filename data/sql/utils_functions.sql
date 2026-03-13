@@ -554,6 +554,47 @@ $function$ ;
 
 
 \echo '-------------------------------------------------------------------------------'
+\echo 'Set function "utilisateurs.get_role_id_from_uuid_in_string()"'
+CREATE OR REPLACE FUNCTION utilisateurs.get_one_role_id_from_uuid_in_string(strWithUuid text)
+    RETURNS integer
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which returns the validator id_role from a string potentially containing a UUID
+    DECLARE idRole integer;
+    DECLARE extractedUuid uuid;
+    BEGIN
+        IF strWithUuid IS NOT NULL AND strWithUuid != '' AND strWithUuid ~* '\[([-0-9a-fA-F]{36})\]' THEN
+            extractedUuid := regexp_replace(strWithUuid, '.*\[([-0-9a-fA-F]{36})\].*', '\1')::uuid;
+            SELECT utilisateurs.get_id_role_by_uuid(extractedUuid) INTO idRole;
+        ELSE
+            idRole := NULL;
+        END IF;
+        RETURN idRole;
+    END;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "gn_commons.format_validation_comment()"'
+CREATE OR REPLACE FUNCTION gn_commons.format_validation_comment(commentStr text, validatorStr text)
+    RETURNS text
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which formats the validation comment
+    BEGIN
+        IF validatorStr IS NOT NULL AND validatorStr != '' AND validatorStr !~ '\[([-0-9a-fA-F]{36})\]' THEN
+            RETURN concat_ws(' ', commentStr, '- Validateur :', validatorStr);
+        END IF;
+        RETURN commentStr;
+    END;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
 \echo 'Set function "public.fct_trg_meta_dates_change()"'
 CREATE OR REPLACE FUNCTION public.fct_trg_meta_dates_change()
     RETURNS trigger
