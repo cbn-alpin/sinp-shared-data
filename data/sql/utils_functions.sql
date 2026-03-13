@@ -26,6 +26,30 @@ $function$ ;
 
 
 \echo '-------------------------------------------------------------------------------'
+\echo 'Set function "get_id_area_by_code()"'
+CREATE OR REPLACE FUNCTION ref_geo.get_id_area_by_code(typecode VARCHAR, areacode VARCHAR)
+    RETURNS integer
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function which return the id_area from l_areas
+    DECLARE idArea integer;
+
+    BEGIN
+        SELECT INTO idArea id_area
+        FROM ref_geo.l_areas AS a
+            JOIN ref_geo.bib_areas_types AS t
+                ON t.id_type = a.id_type
+        WHERE t.type_code = typeCode
+            AND a.area_code = areaCode ;
+
+        RETURN idArea ;
+    END;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
 \echo 'Set function "get_id_acquisition_framework_by_name()"'
 CREATE OR REPLACE FUNCTION gn_meta.get_id_acquisition_framework_by_name(afName character varying)
     RETURNS integer
