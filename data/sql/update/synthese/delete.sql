@@ -15,10 +15,10 @@ SET client_encoding = 'UTF8';
 -- TODO: delete cascade or not ?
 DO $$
 DECLARE
-    step INTEGER;
-    stopAt INTEGER;
+    step INTEGER ;
+    stopAt INTEGER ;
     offsetCnt INTEGER := 0 ;
-    affectedRows INTEGER;
+    affectedRows INTEGER ;
 BEGIN
     -- Set dynamicly stopAt and step
     stopAt := gn_imports.computeImportTotal('gn_imports.${syntheseImportTable}', 'D') ;

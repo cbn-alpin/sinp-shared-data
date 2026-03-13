@@ -24,10 +24,11 @@ ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_update_cor_area_synthese ;
 \echo 'Batch updating in "synthese" of the imported observations'
 DO $$
 DECLARE
-    step INTEGER;
-    stopAt INTEGER;
+    step INTEGER ;
+    stopAt INTEGER ;
     offsetCnt INTEGER := 0 ;
-    affectedRows INTEGER;
+    affectedRows INTEGER ;
+    startTime TIMESTAMP ;
 BEGIN
     -- Set dynamicly stopAt and step
     stopAt := gn_imports.computeImportTotal('gn_imports.${syntheseImportTable}', 'U') ;
@@ -39,6 +40,8 @@ BEGIN
 
         RAISE NOTICE '-------------------------------------------------' ;
         RAISE NOTICE 'Try to update % observations from %', step, offsetCnt ;
+
+        startTime := clock_timestamp();
 
         UPDATE gn_synthese.synthese AS s SET
             unique_id_sinp = sit.unique_id_sinp,
@@ -150,10 +153,10 @@ BEGIN
                 precision,
                 date_min,
                 date_max,
-                validator,
+                gn_imports.clean_observers_uuid(validator),
                 validation_comment,
                 validation_date,
-                observers,
+                gn_imports.clean_observers_uuid(observers),
                 determiner,
                 id_digitiser,
                 id_nomenclature_determination_method,
@@ -177,6 +180,7 @@ BEGIN
 
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
         RAISE NOTICE 'Updated synthese rows: %', affectedRows ;
+        RAISE NOTICE 'Loop execution time: %', clock_timestamp() - startTime;
 
         offsetCnt := offsetCnt + (step) ;
     END LOOP ;

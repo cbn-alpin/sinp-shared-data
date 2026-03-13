@@ -25,10 +25,11 @@ ALTER TABLE gn_synthese.synthese DISABLE TRIGGER tri_insert_cor_area_synthese ;
 -- TODO: check if we can use source_key and entity_source_pk_value to link observations in NOT EXISTS
 DO $$
 DECLARE
-    step INTEGER;
-    stopAt INTEGER;
+    step INTEGER ;
+    stopAt INTEGER ;
     offsetCnt INTEGER := 0 ;
-    affectedRows INTEGER;
+    affectedRows INTEGER ;
+    startTime TIMESTAMP ;
 BEGIN
     -- Set dynamicly stopAt and step
     stopAt := gn_imports.computeImportTotal('gn_imports.${syntheseImportTable}', 'I') ;
@@ -40,6 +41,8 @@ BEGIN
 
         RAISE NOTICE '-------------------------------------------------' ;
         RAISE NOTICE 'Try to insert % observations from %', step, offsetCnt ;
+
+        startTime := clock_timestamp();
 
         INSERT INTO gn_synthese.synthese (
             unique_id_sinp,
@@ -182,6 +185,7 @@ BEGIN
 
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
         RAISE NOTICE 'Inserted synthese rows: %', affectedRows ;
+        RAISE NOTICE 'Loop execution time: %', clock_timestamp() - startTime;
 
         offsetCnt := offsetCnt + (step) ;
     END LOOP ;
