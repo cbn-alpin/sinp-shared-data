@@ -198,6 +198,60 @@ ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_update_cor_area_synthese ;
 ALTER TABLE gn_synthese.synthese ENABLE TRIGGER tri_update_calculate_sensitivity ;
 
 
+\echo '-------------------------------------------------------------------------------'
+\echo 'Disable triggers on cor_observer_synthese'
+ALTER TABLE gn_synthese.cor_observer_synthese DISABLE TRIGGER trg_maj_synthese_observers_txt;
+
+ALTER TABLE gn_synthese.cor_observer_synthese DROP CONSTRAINT IF EXISTS fk_gn_synthese_id_role ;
+
+ALTER TABLE gn_synthese.cor_observer_synthese DROP CONSTRAINT IF EXISTS fk_gn_synthese_id_synthese ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Clean previous observers for updated observations'
+DELETE FROM gn_synthese.cor_observer_synthese
+WHERE id_synthese IN (
+    SELECT s.id_synthese
+    FROM gn_imports.${syntheseImportTable} AS sit
+    JOIN gn_synthese.synthese AS s ON s.unique_id_sinp = sit.unique_id_sinp
+    WHERE sit.meta_last_action = 'U'
+);
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Insert new observers for updated observations'
+INSERT INTO gn_synthese.cor_observer_synthese (id_synthese, id_role)
+    WITH observers_uuid AS (
+        SELECT
+            unique_id_sinp AS observation_uuid,
+            UNNEST(regexp_matches(observers, '\[([-0-9a-fA-F]{36})\]', 'g'))::uuid AS observer_uuid
+        FROM gn_imports.${syntheseImportTable}
+        WHERE meta_last_action = 'U'
+    )
+    SELECT DISTINCT
+        s.id_synthese,
+        r.id_role
+    FROM observers_uuid AS ou
+        JOIN gn_synthese.synthese AS s
+            ON s.unique_id_sinp = ou.observation_uuid
+        JOIN utilisateurs.t_roles AS r
+            ON r.uuid_role = ou.observer_uuid
+ON CONFLICT ON CONSTRAINT pk_cor_observer_synthese DO NOTHING ;
+
+
+\echo '----------------------------------------------------------------------------'
+\echo 'Enable triggers on cor_observer_synthese'
+ALTER TABLE gn_synthese.cor_observer_synthese ENABLE TRIGGER trg_maj_synthese_observers_txt;
+
+ALTER TABLE gn_synthese.cor_observer_synthese ADD CONSTRAINT fk_gn_synthese_id_role
+    FOREIGN KEY (id_role) REFERENCES utilisateurs.t_roles(id_role)
+    ON UPDATE CASCADE ;
+
+ALTER TABLE gn_synthese.cor_observer_synthese ADD CONSTRAINT fk_gn_synthese_id_synthese
+    FOREIGN KEY (id_synthese) REFERENCES gn_synthese.synthese(id_synthese)
+    ON UPDATE CASCADE ON DELETE CASCADE ;
+
+
 \echo '----------------------------------------------------------------------------'
 \echo 'COMMIT if all is ok:'
 COMMIT;
