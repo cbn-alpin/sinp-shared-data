@@ -262,15 +262,15 @@ ALTER TABLE gn_commons.t_validations
 \echo 'Add validations data to gn_commons.t_validations for updated observations'
 WITH validations_to_upsert AS (
     SELECT
-        sit.unique_id_sinp::uuid AS uuid_attached_row,
-        sit.id_nomenclature_valid_status,
-        FALSE AS validation_auto,
-        utilisateurs.get_one_role_id_from_uuid_in_string(sit.validator) AS id_validator,
-        gn_commons.format_validation_comment(sit.validation_comment, sit.validator) AS validation_comment,
-        sit.validation_date
-    FROM gn_imports.${syntheseImportTable} AS sit
-    WHERE sit.meta_last_action = 'U'
-        AND sit.id_nomenclature_valid_status IS NOT NULL
+        unique_id_sinp::uuid AS uuid_attached_row,
+        id_nomenclature_valid_status,
+        gn_commons.determine_auto_validation(validator, validation_date, id_nomenclature_valid_status) AS validation_auto,
+        utilisateurs.get_one_role_id_from_uuid_in_string(validator) AS id_validator,
+        gn_commons.format_validation_comment(validation_comment, validator) AS validation_comment,
+        validation_date
+    FROM gn_imports.${syntheseImportTable}
+    WHERE meta_last_action = 'U'
+        AND id_nomenclature_valid_status IS NOT NULL
 ),
 updated AS (
     UPDATE gn_commons.t_validations AS v SET

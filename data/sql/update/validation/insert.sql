@@ -58,12 +58,12 @@ BEGIN
                 SELECT 'X'
                 FROM gn_commons.t_validations AS v
                 WHERE v.uuid_attached_row = vit.unique_id_sinp
+                    AND v.validation_date = vit.creation_date
             )
             AND vit.meta_last_action = 'I'
         ORDER BY vit.gid ASC
-        -- With NOT EXISTS don't use OFFSET because it's eliminate previously inserted rows.
-        -- OFFSET offsetCnt
         LIMIT step ;
+        -- With NOT EXISTS don't use OFFSET because it's eliminate previously inserted rows.
 
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
         RAISE NOTICE 'Inserted validation rows: %', affectedRows ;

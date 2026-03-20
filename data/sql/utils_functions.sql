@@ -578,8 +578,8 @@ $function$ ;
 
 
 \echo '-------------------------------------------------------------------------------'
-\echo 'Set function "utilisateurs.get_role_id_from_uuid_in_string()"'
-CREATE OR REPLACE FUNCTION utilisateurs.get_one_role_id_from_uuid_in_string(strWithUuid text)
+\echo 'Set function "utilisateurs.get_one_role_id_from_uuid_in_string()"'
+CREATE OR REPLACE FUNCTION utilisateurs.get_one_role_id_from_uuid_in_string(strWithUuid varchar)
     RETURNS integer
     LANGUAGE plpgsql
     IMMUTABLE
@@ -602,7 +602,7 @@ $function$ ;
 
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "gn_commons.format_validation_comment()"'
-CREATE OR REPLACE FUNCTION gn_commons.format_validation_comment(commentStr text, validatorStr text)
+CREATE OR REPLACE FUNCTION gn_commons.format_validation_comment(commentStr text, validatorStr varchar)
     RETURNS text
     LANGUAGE plpgsql
     IMMUTABLE
@@ -610,10 +610,39 @@ AS
 $function$
     -- Function which formats the validation comment
     BEGIN
-        IF validatorStr IS NOT NULL AND validatorStr != '' AND validatorStr !~ '\[([-0-9a-fA-F]{36})\]' THEN
-            RETURN concat_ws(' ', commentStr, '- Validateur :', validatorStr);
+        IF (
+            validatorStr IS NOT NULL
+            AND validatorStr != ''
+            AND validatorStr !~ '\[([-0-9a-fA-F]{36})\]'
+            AND TRIM(validatorStr) != '(Inconnu)'
+        ) THEN
+            IF commentStr IS NOT NULL AND commentStr != '' THEN
+                RETURN concat_ws(' ', commentStr, '- Validateur :', validatorStr);
+            ELSE
+                RETURN concat_ws(' ', 'Validateur :', validatorStr);
+            END IF;
         END IF;
         RETURN commentStr;
+    END;
+$function$ ;
+
+
+\echo '-------------------------------------------------------------------------------'
+\echo 'Set function "gn_commons.determine_auto_validation()"'
+CREATE OR REPLACE FUNCTION gn_commons.determine_auto_validation(validatorStr text, validationDate timestamp, validStatusId int)
+    RETURNS bool
+    LANGUAGE plpgsql
+    IMMUTABLE
+AS
+$function$
+    -- Function that determines whether a validation was automatic (=TRUE) or manual (=FALSE)
+    BEGIN
+        IF validatorStr IS NOT NULL AND validatorStr != '' AND TRIM(validatorStr) != '(Inconnu)'
+            AND validationDate IS NOT NULL
+            AND validStatusId != ref_nomenclatures.get_id_nomenclature('STATUT_VALID', '0') THEN
+                RETURN FALSE;
+        END IF;
+        RETURN TRUE;
     END;
 $function$ ;
 

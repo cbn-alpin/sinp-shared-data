@@ -24,10 +24,10 @@ CREATE TABLE gn_imports.:validationImportTable AS
         validation_comment AS comment,
         validation_auto AS "automatic",
         validation_date AS creation_date,
-        additional_data,
-        meta_create_date,
-        meta_update_date,
-        last_action AS meta_last_action
+        NULL::JSONB AS additional_data,
+        NULL::TIMESTAMP AS meta_create_date,
+        NULL::TIMESTAMP AS meta_update_date,
+        NULL::BPCHAR(1) AS meta_last_action
     FROM gn_commons.t_validations
 WITH NO DATA ;
 

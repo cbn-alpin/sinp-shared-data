@@ -263,7 +263,7 @@ INSERT INTO gn_commons.t_validations (
     SELECT
         unique_id_sinp::uuid AS uuid_attached_row,
         id_nomenclature_valid_status,
-        FALSE AS validation_auto,
+        gn_commons.determine_auto_validation(validator, validation_date, id_nomenclature_valid_status) AS validation_auto,
         utilisateurs.get_one_role_id_from_uuid_in_string(validator) AS id_validator,
         gn_commons.format_validation_comment(validation_comment, validator) AS validation_comment,
         validation_date
