@@ -30,22 +30,11 @@ BEGIN
         RAISE NOTICE '-------------------------------------------------' ;
         RAISE NOTICE 'Try to update % organisms from %', step, offsetCnt ;
 
-        UPDATE utilisateurs.bib_organismes AS bo SET
-            uuid_organisme = oit.unique_id,
-            nom_organisme = oit.name,
-            adresse_organisme = oit.address,
-            cp_organisme = oit.postal_code,
-            ville_organisme = oit.city,
-            tel_organisme = oit.phone,
-            fax_organisme = oit.fax,
-            email_organisme = oit.email,
-            url_organisme = oit.organism_url,
-            url_logo = oit.logo_url
-        FROM (
+        WITH organisms_to_update AS (
             SELECT
                 unique_id,
-                name,
-                address,
+                "name",
+                "address",
                 postal_code,
                 city,
                 phone,
@@ -58,13 +47,23 @@ BEGIN
             ORDER BY gid ASC
             LIMIT step
             OFFSET offsetCnt
-        ) AS oit
-        WHERE (
-                oit.unique_id = bo.uuid_organisme
-                -- La présence de doublon avec le même nom ne permet pas de mettre à jour en se basant sur le nom.
-                -- La contrainte "bib_organismes_un" bloque la mise à jour...
-                --OR oit.name = bo.nom_organisme
-            ) ;
+        )
+        UPDATE utilisateurs.bib_organismes AS bo SET
+            uuid_organisme = otu.unique_id,
+            nom_organisme = otu.name,
+            adresse_organisme = otu.address,
+            cp_organisme = otu.postal_code,
+            ville_organisme = otu.city,
+            tel_organisme = otu.phone,
+            fax_organisme = otu.fax,
+            email_organisme = otu.email,
+            url_organisme = otu.organism_url,
+            url_logo = otu.logo_url
+        FROM organisms_to_update AS otu
+        WHERE otu.unique_id = bo.uuid_organisme
+            OR otu.name = bo.nom_organisme ;
+        -- GN v2.17 introduces unique index on 'nom_organisme', so we can update UUID on same name.
+        -- On previous GN version clean your table and add unique index on 'nom_organisme'.
 
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
         RAISE NOTICE 'Update affected rows: %', affectedRows ;
