@@ -228,10 +228,13 @@ $$ ;
             id_role
         )
         SELECT
-            pr_occtax.get_id_survey_by_uuid(unique_id_sinp_grp),
-            code_digitiser
+            pr_occtax.get_id_survey_by_uuid(ocit.unique_id_sinp_grp),
+            utilisateurs.get_id_role_by_uuid(match.arr[1]::uuid)
         FROM gn_imports.${occtaxImportTable} AS ocit
-        WHERE meta_last_action = 'I';
+            CROSS JOIN LATERAL regexp_matches(ocit.observers, '\[([a-fA-F0-9\-]{36})\]', 'g')
+                AS match(arr)
+        WHERE ocit.meta_last_action = 'I'
+        AND ocit.observers IS NOT NULL;
 
 
 \echo '----------------------------------------------------------------------------'
