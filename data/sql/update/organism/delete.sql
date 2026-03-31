@@ -32,16 +32,22 @@ BEGIN
         RAISE NOTICE 'Try to delete % organisms from %', step, offsetCnt ;
 
         WITH organism_to_delete AS (
-            SELECT name, unique_id
+            SELECT
+                "name",
+                unique_id
             FROM gn_imports.${organismImportTable}
             WHERE meta_last_action = 'D'
             ORDER BY gid ASC
             LIMIT step
             OFFSET offsetCnt
         )
-        DELETE FROM ONLY utilisateurs.bib_organismes
-        WHERE nom_organisme IN (SELECT name FROM organism_to_delete)
-            OR uuid_organisme IN (SELECT unique_id FROM organism_to_delete) ;
+        DELETE FROM ONLY utilisateurs.bib_organismes AS bo
+        USING organism_to_delete AS otd
+        WHERE bo.uuid_organisme = otd.unique_id
+            OR (
+                bo.nom_organisme = otd.name
+                AND utilisateurs.get_id_organism_by_uuid(otd.unique_id::uuid) IS NULL
+            ) ;
 
         GET DIAGNOSTICS affectedRows = ROW_COUNT;
         RAISE NOTICE 'Delete affected rows: %', affectedRows ;

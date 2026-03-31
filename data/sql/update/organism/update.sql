@@ -60,8 +60,11 @@ BEGIN
             url_organisme = otu.organism_url,
             url_logo = otu.logo_url
         FROM organisms_to_update AS otu
-        WHERE otu.unique_id = bo.uuid_organisme
-            OR otu.name = bo.nom_organisme ;
+        WHERE bo.uuid_organisme = otu.unique_id
+            OR (
+                bo.nom_organisme = otu.name
+                AND utilisateurs.get_id_organism_by_uuid(otu.unique_id::uuid) IS NULL
+            );
         -- GN v2.17 introduces unique index on 'nom_organisme', so we can update UUID on same name.
         -- On previous GN version clean your table and add unique index on 'nom_organisme'.
 
