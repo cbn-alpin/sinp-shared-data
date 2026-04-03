@@ -45,9 +45,7 @@ BEGIN
             acquisition_framework_parent_id = afit.parent_id,
             is_parent = afit.is_parent,
             acquisition_framework_start_date = afit.start_date,
-            acquisition_framework_end_date = afit.end_date,
-            meta_create_date = afit.meta_create_date,
-            meta_update_date = afit.meta_update_date
+            acquisition_framework_end_date = afit.end_date
         FROM (
             SELECT
                 unique_id,
@@ -62,9 +60,7 @@ BEGIN
                 NULL::int AS parent_id,
                 is_parent,
                 start_date,
-                end_date,
-                meta_create_date,
-                meta_update_date
+                end_date
             FROM gn_imports.${afImportTable}
             WHERE meta_last_action = 'U'
                 AND is_parent = True
@@ -98,9 +94,7 @@ BEGIN
             acquisition_framework_parent_id = afit.parent_id,
             is_parent = afit.is_parent,
             acquisition_framework_start_date = afit.start_date,
-            acquisition_framework_end_date = afit.end_date,
-            meta_create_date = afit.meta_create_date,
-            meta_update_date = afit.meta_update_date
+            acquisition_framework_end_date = afit.end_date
         FROM (
             SELECT
                 unique_id,
@@ -120,9 +114,7 @@ BEGIN
                 ) AS parent_id,
                 is_parent,
                 start_date,
-                end_date,
-                meta_create_date,
-                meta_update_date
+                end_date
             FROM gn_imports.${afImportTable} AS afit0
             WHERE meta_last_action = 'U'
                 AND is_parent = False

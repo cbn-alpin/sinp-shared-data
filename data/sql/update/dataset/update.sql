@@ -48,9 +48,7 @@ BEGIN
             id_nomenclature_collecting_method = dit.id_nomenclature_collecting_method,
             id_nomenclature_data_origin = dit.id_nomenclature_data_origin,
             id_nomenclature_source_status = dit.id_nomenclature_source_status,
-            id_nomenclature_resource_type = dit.id_nomenclature_resource_type,
-            meta_create_date = dit.meta_create_date,
-            meta_update_date = dit.meta_update_date
+            id_nomenclature_resource_type = dit.id_nomenclature_resource_type
         FROM (
             SELECT
                 unique_id,
@@ -70,9 +68,7 @@ BEGIN
                 id_nomenclature_collecting_method,
                 id_nomenclature_data_origin,
                 id_nomenclature_source_status,
-                id_nomenclature_resource_type,
-                meta_create_date,
-                meta_update_date
+                id_nomenclature_resource_type
             FROM gn_imports.${datasetImportTable}
             WHERE meta_last_action = 'U'
             ORDER BY gid ASC

@@ -34,17 +34,13 @@ BEGIN
             name_source,
             desc_source,
             entity_source_pk_field,
-            url_source,
-            meta_create_date,
-            meta_update_date
+            url_source
         )
         SELECT
             name_source,
             desc_source,
             entity_source_pk_field,
-            url_source,
-            meta_create_date,
-            meta_update_date
+            url_source
         FROM gn_imports.${sourceImportTable} AS sit
         WHERE sit.meta_last_action = 'I'
             AND NOT EXISTS (

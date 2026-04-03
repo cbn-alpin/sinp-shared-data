@@ -49,9 +49,7 @@ BEGIN
             id_nomenclature_collecting_method,
             id_nomenclature_data_origin,
             id_nomenclature_source_status,
-            id_nomenclature_resource_type,
-            meta_create_date,
-            meta_update_date
+            id_nomenclature_resource_type
         )
         SELECT
             unique_id,
@@ -71,9 +69,7 @@ BEGIN
             id_nomenclature_collecting_method,
             id_nomenclature_data_origin,
             id_nomenclature_source_status,
-            id_nomenclature_resource_type,
-            meta_create_date,
-            meta_update_date
+            id_nomenclature_resource_type
         FROM gn_imports.${datasetImportTable} AS dit
         WHERE NOT EXISTS (
                 SELECT 'X'

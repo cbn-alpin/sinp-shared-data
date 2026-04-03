@@ -39,9 +39,7 @@ BEGIN
             id_organisme = uit.id_organisme,
             remarques = uit.comment,
             active = uit.enable,
-            champs_addi = uit.additional_data,
-            date_insert = uit.meta_create_date,
-            date_update = uit.meta_update_date
+            champs_addi = uit.additional_data
         FROM (
             SELECT
                 unique_id,
@@ -52,10 +50,11 @@ BEGIN
                 id_organisme,
                 comment,
                 enable,
-                additional_data,
-                meta_create_date,
-                meta_update_date,
-                meta_last_action
+                COALESCE(additional_data, '{}'::jsonb) ||
+                    jsonb_build_object(
+                        'originMetaCreateDate', meta_create_date,
+                        'originMetaUpdateDate', meta_update_date
+                ) AS additional_data
             FROM gn_imports.${userImportTable}
             WHERE meta_last_action = 'U'
             ORDER BY gid ASC

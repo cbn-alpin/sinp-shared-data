@@ -44,9 +44,7 @@ BEGIN
             acquisition_framework_parent_id,
             is_parent,
             acquisition_framework_start_date,
-            acquisition_framework_end_date,
-            meta_create_date,
-            meta_update_date
+            acquisition_framework_end_date
         )
         SELECT
             unique_id,
@@ -61,9 +59,7 @@ BEGIN
             NULL,
             is_parent,
             start_date,
-            end_date,
-            meta_create_date,
-            meta_update_date
+            end_date
         FROM gn_imports.${afImportTable} AS afit
         WHERE NOT EXISTS (
                 SELECT 'X'
@@ -97,9 +93,7 @@ BEGIN
             acquisition_framework_parent_id,
             is_parent,
             acquisition_framework_start_date,
-            acquisition_framework_end_date,
-            meta_create_date,
-            meta_update_date
+            acquisition_framework_end_date
         )
         SELECT
             unique_id,
@@ -119,9 +113,7 @@ BEGIN
             ),
             is_parent,
             start_date,
-            end_date,
-            meta_create_date,
-            meta_update_date
+            end_date
         FROM gn_imports.${afImportTable} AS afit
         WHERE NOT EXISTS (
                 SELECT 'X'

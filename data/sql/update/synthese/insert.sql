@@ -104,8 +104,6 @@ BEGIN
             comment_context,
             comment_description,
             additional_data,
-            meta_create_date,
-            meta_update_date,
             last_action
         )
         SELECT
@@ -167,9 +165,11 @@ BEGIN
             id_nomenclature_determination_method,
             comment_context,
             comment_description,
-            additional_data,
-            meta_create_date,
-            meta_update_date,
+            COALESCE(additional_data, '{}'::jsonb) ||
+                jsonb_build_object(
+                    'originMetaCreateDate', meta_create_date,
+                    'originMetaUpdateDate', meta_update_date
+            ) AS additional_data,
             meta_last_action
         FROM gn_imports.${syntheseImportTable} AS sit
         WHERE NOT EXISTS (
@@ -177,8 +177,8 @@ BEGIN
                 FROM gn_synthese.synthese AS s
                 WHERE s.unique_id_sinp = sit.unique_id_sinp
             )
-            AND sit.meta_last_action = 'I'
-        ORDER BY sit.gid ASC
+            AND meta_last_action = 'I'
+        ORDER BY gid ASC
         -- With NOT EXISTS don't use OFFSET because it's eliminate previously inserted rows.
         -- OFFSET offsetCnt
         LIMIT step ;

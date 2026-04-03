@@ -102,8 +102,6 @@ BEGIN
             comment_context = sit.comment_context,
             comment_description = sit.comment_description,
             additional_data = sit.additional_data,
-            meta_create_date = sit.meta_create_date,
-            meta_update_date = sit.meta_update_date,
             last_action = sit.meta_last_action
         FROM (
             SELECT
@@ -162,9 +160,11 @@ BEGIN
                 id_nomenclature_determination_method,
                 comment_context,
                 comment_description,
-                additional_data,
-                meta_create_date,
-                meta_update_date,
+                COALESCE(additional_data, '{}'::jsonb) ||
+                    jsonb_build_object(
+                        'originMetaCreateDate', meta_create_date,
+                        'originMetaUpdateDate', meta_update_date
+                ) AS additional_data,
                 meta_last_action
             FROM gn_imports.${syntheseImportTable}
             WHERE meta_last_action = 'U'

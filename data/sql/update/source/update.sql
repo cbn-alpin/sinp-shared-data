@@ -36,17 +36,13 @@ BEGIN
             name_source = sit.name_source,
             desc_source = sit.desc_source,
             entity_source_pk_field = sit.entity_source_pk_field,
-            url_source = sit.url_source,
-            meta_create_date = sit.meta_create_date,
-            meta_update_date = sit.meta_update_date
+            url_source = sit.url_source
         FROM (
             SELECT
                 name_source,
                 desc_source,
                 entity_source_pk_field,
-                url_source,
-                meta_create_date,
-                meta_update_date
+                url_source
             FROM gn_imports.${sourceImportTable}
             WHERE meta_last_action = 'U'
             ORDER BY gid ASC

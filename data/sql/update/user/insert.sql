@@ -39,22 +39,22 @@ BEGIN
             id_organisme,
             remarques,
             active,
-            champs_addi,
-            date_insert,
-            date_update
+            champs_addi
         )
         SELECT
             unique_id,
             identifier,
             firstname,
-            name,
+            "name",
             email,
             id_organisme,
             comment,
-            enable,
-            additional_data,
-            meta_create_date,
-            meta_update_date
+            "enable",
+            COALESCE(additional_data, '{}'::jsonb) ||
+                jsonb_build_object(
+                    'originMetaCreateDate', meta_create_date,
+                    'originMetaUpdateDate', meta_update_date
+            ) AS additional_data
         FROM gn_imports.${userImportTable} AS uit
         WHERE uit.meta_last_action = 'I'
             AND NOT EXISTS (
