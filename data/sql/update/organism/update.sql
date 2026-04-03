@@ -41,7 +41,8 @@ BEGIN
                 fax,
                 email,
                 organism_url,
-                logo_url
+                logo_url,
+                additional_data
             FROM gn_imports.${organismImportTable}
             WHERE meta_last_action = 'U'
             ORDER BY gid ASC
@@ -58,7 +59,8 @@ BEGIN
             fax_organisme = otu.fax,
             email_organisme = otu.email,
             url_organisme = otu.organism_url,
-            url_logo = otu.logo_url
+            url_logo = otu.logo_url,
+            additional_data = otu.additional_data
         FROM organisms_to_update AS otu
         WHERE bo.uuid_organisme = otu.unique_id
             OR (
