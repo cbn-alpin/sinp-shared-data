@@ -638,7 +638,6 @@ $function$
     -- Function that determines whether a validation was automatic (=TRUE) or manual (=FALSE)
     BEGIN
         IF validatorStr IS NOT NULL AND validatorStr != '' AND TRIM(validatorStr) != '(Inconnu)'
-            AND validationDate IS NOT NULL
             AND validStatusId != ref_nomenclatures.get_id_nomenclature('STATUT_VALID', '0') THEN
                 RETURN FALSE;
         END IF;
