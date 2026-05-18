@@ -649,25 +649,16 @@ $function$ ;
 \echo '-------------------------------------------------------------------------------'
 \echo 'Set function "public.fct_trg_meta_dates_change()"'
 CREATE OR REPLACE FUNCTION public.fct_trg_meta_dates_change()
-    RETURNS trigger
-    LANGUAGE plpgsql
+ RETURNS trigger
+ LANGUAGE plpgsql
 AS
 $function$
-    -- Modify function to keep origin date when exists.
     BEGIN
-        IF(TG_OP = 'INSERT') THEN
-            -- Test if NEW.meta_create_date is null or empty
-            if (NEW.meta_create_date IS NULL) THEN
-                NEW.meta_create_date = NOW();
-            END IF;
+        IF (TG_OP = 'INSERT') THEN
+            NEW.meta_create_date = NOW();
         ELSIF(TG_OP = 'UPDATE') THEN
-            -- Test if NEW.meta_create_date is null or empty
-            if (NEW.meta_create_date IS NULL) THEN
-                NEW.meta_update_date = NOW();
-            END IF;
-
-            -- Test if NEW.meta_update_date is null or empty
-            if (NEW.meta_update_date IS NULL) THEN
+            NEW.meta_update_date = NOW();
+            IF (NEW.meta_create_date IS NULL) THEN
                 NEW.meta_create_date = NOW();
             END IF;
         END IF;
