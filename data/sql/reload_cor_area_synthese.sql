@@ -521,7 +521,7 @@ WHERE id_area IN (
     )
 ) ;
 
-\echo ' Reinsert all meshes'
+\echo ' Reinsert all meshes into cor_area_synthese'
 -- SINP AURA Preprod: 336 482 236 rows in ~60mn
 DO $$
 DECLARE
@@ -535,7 +535,7 @@ BEGIN
     step := gn_imports.computeImportStep(stopAt) ;
     RAISE NOTICE 'Total found: %, step used: %', stopAt, step ;
 
-    RAISE NOTICE 'Start to loop on data to insert in "synthese" table' ;
+    RAISE NOTICE 'Start to loop on data to insert in "cor_area_synthese" table' ;
     WHILE offsetCnt < stopAt LOOP
 
         RAISE NOTICE '-------------------------------------------------' ;
